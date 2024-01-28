@@ -11,13 +11,13 @@ const plateSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 1,
-    max: 24,
+    max: 16,
   },
   nCol: {
     type: Number,
     required: true,
     min: 1,
-    max: 16,
+    max: 24,
   },
   wells: [{
     reagent: { type: String },

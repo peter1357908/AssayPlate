@@ -8,15 +8,15 @@ const Home = () => {
   const navigate = useNavigate();
   const [cookies, removeCookie] = useCookies([]);
   const [usernameState, setUsername] = useState("");
+  const platesURL = `${import.meta.env.VITE_SERVER_URL}/plates`;
   useEffect(() => {
     // this convoluted definition is all because we want to await the axios.post...
     const verifyCookie = async () => {
       if (!cookies.token) {
         navigate("/login");
       }
-      const { data } = await axios.post(
-        import.meta.env.VITE_SERVER_URL,
-        {},
+      const plates = await axios.get(
+        platesURL,
         { withCredentials: true }
       );
       const { status, username } = data;

@@ -7,8 +7,50 @@ const isIterable = object =>
   object != null && typeof object[Symbol.iterator] === 'function'
 
 module.exports.ReadPlates = async (req, res) => {
-  await req.user.populate("plates");
-  return res.json(req.user.plates);
+  // if empty request, return all plates and username (treat this as a login attempt with token)
+  // otherwise, return select plates
+  if (!isIterable(req.body.IDs)) {
+    await req.user.populate("plates");
+    return res.json({ plates: req.user.plates, username: req.user.username });
+  }
+
+  const plates = [];
+  for (let _id of req.body.IDs) {
+    if (typeof _id != "string" || !ObjectId.isValidObjectId(_id)) {
+      plates.push({
+        _id,
+        reason: "Invalid _id."
+      });
+      continue;
+    }
+
+    let index = req.user.plates.indexOf(_id);
+    if (index == -1) {
+      plates.push({
+        _id,
+        reason: "You do not own the specified plate."
+      });
+      continue;
+    }
+
+    // then, try to find the plate
+    let plate = await Plate.findById(_id);
+
+    if (!plate) {
+      // this might happen when the plate is deleted but the ownership wasn't updated correctly
+      plates.push({
+        _id,
+        reason: "You own the specified plate but somehow we could not find the plate' data. Removed the plate from your ownership."
+      });
+      req.user.plates.splice(index, 1);
+      try { await req.user.save(); } catch (err) { console.log(err); }
+      continue;
+    }
+
+    plates.push(plate);
+  }
+
+  return res.json({ plates });
 };
 
 module.exports.CreatePlates = async (req, res) => {
@@ -28,14 +70,14 @@ module.exports.CreatePlates = async (req, res) => {
       });
       continue;
     }
-    if (typeof nRow != "number" || !Number.isInteger(nRow) || nRow < 1 || nRow > 24) {
+    if (typeof nRow != "number" || !Number.isInteger(nRow) || nRow < 1 || nRow > 16) {
       output.push({
         isCreated: false,
         reason: "Number of rows must be an integer between 1 and 24, inclusive."
       });
       continue;
     }
-    if (typeof nCol != "number" || !Number.isInteger(nCol) || nCol < 1 || nCol > 16) {
+    if (typeof nCol != "number" || !Number.isInteger(nCol) || nCol < 1 || nCol > 24) {
       output.push({
         isCreated: false,
         reason: "Number of columns must be an integer between 1 and 16, inclusive."
