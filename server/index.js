@@ -5,6 +5,7 @@ const app = express();
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const authRoute = require("./Routes/AuthRoute");
+const platesRoute = require("./Routes/PlatesRoute");
 const { MONGO_URL, PORT, FRONTEND_URL } = process.env;
 
 mongoose
@@ -17,8 +18,6 @@ app.listen(PORT, () => {
 });
 
 app.use(
-  // i.e., this basically disables CORS, since only requests
-  // from own origin with the four given methods are allowed.
   cors({
     origin: [FRONTEND_URL],
     methods: ["GET", "POST", "PUT", "DELETE"],
@@ -29,3 +28,4 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 app.use("/", authRoute);
+app.use("/", platesRoute);

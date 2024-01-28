@@ -4,15 +4,16 @@ const bcrypt = require("bcrypt");
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: [true, "Your username is required"],
+    required: true,
     unique: true,
+    minLength: 1,
     maxLength: 20,
   },
   password: {
     type: String,
-    required: [true, "Your password is required"],
-    maxLength: 20,
+    required: true,
   },
+  plates: [{ type: mongoose.Schema.Types.ObjectId, ref: "Plate" }],
   createdAt: {
     type: Date,
     default: new Date(),
