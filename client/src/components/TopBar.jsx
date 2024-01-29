@@ -10,7 +10,7 @@ const platesSpecificURL = `${platesURL}/specific`;
 const TopBar = (props) => {
   const { currPlate, setCurrPlate, isModified, setIsModified } = props;
   const navigate = useNavigate();
-  const [cookies, removeCookie] = useCookies(['token']);
+  const [cookies, removeCookie] = useCookies(["token"]);
   const [username, setUsername] = useState("");
   const [platesCache, setPlatesCache] = useState([]);
 

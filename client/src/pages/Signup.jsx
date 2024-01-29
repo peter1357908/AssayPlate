@@ -10,29 +10,20 @@ const Signup = () => {
   const navigate = useNavigate();
   
   // if a token already exists, just navigate to the home page.
-  const [cookies] = useCookies([]);
+  const [cookies] = useCookies(["token"]);
   useEffect(() => {
     if (cookies.token && cookies.token != "undefined") {
       navigate("/");
     }
   }, []);
   
-  const [inputValue, setInputValue] = useState({
-    username: "",
-    password: "",
-  });
-  const { username, password } = inputValue;
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const handleUsernameChange = (e) => {
-    setInputValue({
-      username: e.target.value,
-      password,
-    });
+    setUsername(e.target.value);
   };
   const handlePasswordChange = (e) => {
-    setInputValue({
-      username,
-      password: e.target.value,
-    });
+    setPassword(e.target.value);
   };
 
   const handleSubmit = async (e) => {
@@ -40,9 +31,7 @@ const Signup = () => {
     try {
       const { data } = await axios.post(
         `${import.meta.env.VITE_SERVER_URL}/signup`,
-        {
-          ...inputValue,
-        },
+        { username, password },
         { withCredentials: true }
       );
       const { success, message } = data;

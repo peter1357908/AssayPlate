@@ -8,7 +8,7 @@ const Home = () => {
 
   const sharedProps = {
     currPlate, setCurrPlate, isModified, setIsModified
-  }
+  };
 
   return (
     <div className="home-page">
