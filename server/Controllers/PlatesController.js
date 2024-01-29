@@ -99,7 +99,7 @@ module.exports.CreatePlates = async (req, res) => {
       let failureReason = null;
       for (let well of wells) {
         let { reagent, antibody, concentration } = well;
-        if (typeof reagent != "string" || !reagent.match(/^R\d+/)) {
+        if (typeof reagent != "string" || !reagent.match(/^R\d+$/)) {
           failureReason = `reagent "${reagent}" is invalid! It must be a string that starts with "R" and followed by numbers.`;
           break;
         }
@@ -241,7 +241,7 @@ module.exports.UpdatePlates = async (req, res) => {
       let failureReason = null;
       for (let well of wells) {
         let { reagent, antibody, concentration } = well;
-        if (typeof reagent != "string" || !reagent.match(/^R\d+/)) {
+        if (typeof reagent != "string" || !reagent.match(/^R\d+$/)) {
           failureReason = `reagent "${reagent}" is invalid! It must be a string that starts with "R" and followed by numbers.`;
           break;
         }

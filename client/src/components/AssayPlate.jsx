@@ -28,7 +28,7 @@ const AssayPlate = ({ currPlate, setCurrPlate }) => {
     <>
       <div className="assay-plate">
         <h4>
-          assay plate placeholder
+          Selected plate: {currPlate ? currPlate.plateName : "(no currPlate)"}
         </h4>
       </div>
     </>

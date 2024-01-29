@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Autocomplete, TextField, Typography } from '@mui/material';
 
 const platesURL = `${import.meta.env.VITE_SERVER_URL}/plates`;
 const platesSpecificURL = `${platesURL}/specific`;
@@ -27,7 +28,6 @@ const TopBar = (props) => {
         platesURL,
         { withCredentials: true }
       );
-      console.log(data);
       if (data.message) {
         removeCookie("token");
         return navigate("/login");
@@ -44,12 +44,19 @@ const TopBar = (props) => {
   // ACTIONS ----------------------------------------------
 
   // swap the current plate; warn about discarding changes if applicable
-  const onDropdownChange = (event) => {
-    if (isModified) {
+  const onDropdownChange = (event, value) => {
+    console.log(value._id);
+    if (currPlate && event.target.value === currPlate._id) { return; }
+    // if (isModified) {
 
-    }
+    // }
 
-    setSelectedItem(event.target.value);
+    // for (let plate of platesCache) {
+    //   if (plate._id === event.target.value) {
+    //     setCurrPlate(plate);
+    //     break;
+    //   }
+    // }
   };
 
   const logout = () => {
@@ -65,33 +72,31 @@ const TopBar = (props) => {
   
   // RENDERS ----------------------------------------------
 
-  const renderDropdownOptions = () => {
-    if (!platesCache) {
-      return [<option value="" disabled>No plate yet!</option>]
-    }
-    
-    const options = [];
-
-    return platesCache.map((plate) => (
-      <option value={plate._id}>{plate.plateName}</option>
-    ));
-  };
-
   return (
     <div className="top-bar">
-      {/* <div className="dropdown-container">
-        <label htmlFor="dropdown">Showing plate:</label>
-        <select id="dropdown" value={selectedOption} onChange={handleDropdownChange}>
-        
-          <option value="Option 1">Option 1</option>
-          <option value="Option 2">Option 2</option>
-          <option value="Option 3">Option 3</option>
-        </select>
-      </div>
+      <Autocomplete 
+        style={{ width: 250 }}
+        options={platesCache}
+        autoHighlight
+        disableClearable
+        getOptionKey={(plate) => plate._id}
+        getOptionLabel={(plate) => plate.plateName}
+        onChange={onDropdownChange}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Choose a plate"
+            inputProps={{
+              ...params.inputProps,
+              autoComplete: 'off'
+            }}
+          />
+        )}
+      />
       <button onClick={handleButtonClick}>Button 1</button>
-      <button onClick={handleButtonClick}>Button 2</button> */}
+      <button onClick={handleButtonClick}>Button 2</button>
 
-      <label htmlFor="logout">{username}</label>
+      <Typography>{username}</Typography>
       <button id="logout" onClick={logout}>LOGOUT</button>
     </div>
   )

@@ -25,9 +25,9 @@ module.exports.Signup = async (req, res) => {
   }
   let user;
   try {
-    user = await User.create({ username, password });
+    user = await User.create({ username, password: await bcrypt.hash(password, 12) });
   } catch (err) {
-    return res.json({message:err.error.message});
+    return res.json({message:err.toString()});
   }
   
   const token = createSecretToken(user._id);
@@ -36,7 +36,7 @@ module.exports.Signup = async (req, res) => {
     httpOnly: false,
   });
   return res.json({ 
-    message: `User "${username}" signed up successfully. Logged in automatically.`,
+    message: `"${username}" signed up successfully. Logged in automatically.`,
     success: true
   });
 };
@@ -58,6 +58,7 @@ module.exports.Login = async (req, res) => {
   }
   const auth = await bcrypt.compare(password, user.password)
   if (!auth) {
+    console.log("actually incorrect password... but how??");
     return res.json({message:"Incorrect password or username" }); 
   }
   const token = createSecretToken(user._id);
@@ -66,7 +67,7 @@ module.exports.Login = async (req, res) => {
     httpOnly: false,
   });
   return res.json({
-    message: `User "${username}" logged in successfully`,
+    message: `"${username}" logged in successfully`,
     success: true
   });
 }
