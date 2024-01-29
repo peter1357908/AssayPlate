@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Paper, Avatar, TextField, Button, Typography, Link } from "@mui/material";
+import LockPersonIcon from "@mui/icons-material/LockPerson";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -10,7 +12,7 @@ const Login = () => {
   // if a token already exists, just navigate to the home page.
   const [cookies] = useCookies([]);
   useEffect(() => {
-    if (cookies.token) {
+    if (cookies.token && cookies.token != "undefined") {
       navigate("/");
     }
   }, []);
@@ -20,22 +22,18 @@ const Login = () => {
     password: "",
   });
   const { username, password } = inputValue;
-  const handleOnChange = (e) => {
-    const { name, value } = e.target;
+  const handleUsernameChange = (e) => {
     setInputValue({
-      ...inputValue,
-      [name]: value,
+      username: e.target.value,
+      password,
     });
   };
-
-  const handleError = (err) =>
-    toast.error(err, {
-      position: "bottom-center",
+  const handlePasswordChange = (e) => {
+    setInputValue({
+      username,
+      password: e.target.value,
     });
-  const handleSuccess = (msg) =>
-    toast.success(msg, {
-      position: "bottom-center",
-    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,54 +47,28 @@ const Login = () => {
       );
       const { success, message } = data;
       if (success) {
-        handleSuccess(message);
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
+        toast.success(message, { position: "bottom-center" });
+        navigate("/");
       } else {
-        handleError(message);
+        toast.error(message, { position: "bottom-center" });
       }
     } catch (error) {
       console.log(error);
     }
   };
 
+  const paperStyle = { padding: 20, width: 300, display: "flex", flexDirection: "column", alignItems: "center" };
+  const avatarStyle = { backgroundColor: "#1bbd7e", width: 50, height: 50 };
+  const buttonstyle = { margin: '20px 0' };
+
   return (
-    <div className="form_container">
-      <h2>Account Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="username">Username</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            autoComplete="username"
-            value={username}
-            placeholder="Enter your username"
-            maxLength="20"
-            onChange={handleOnChange}
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            autoComplete="current-password"
-            value={password}
-            placeholder="Enter your password"
-            maxLength="20"
-            onChange={handleOnChange}
-          />
-        </div>
-        <button type="submit">Log In</button>
-        <span>
-          Don't have an account yet? <Link to={"/signup"}>Signup</Link>
-        </span>
-      </form>
-    </div>
+    <Paper elevation={10} style={paperStyle}>
+      <Avatar style={avatarStyle}><LockPersonIcon /></Avatar>
+      <TextField value={username} onChange={handleUsernameChange} inputProps={{maxLength: "20"}} label="Username" placeholder="Enter username" variant="outlined" autoComplete="username" margin="normal" fullWidth required/>
+      <TextField value={password} onChange={handlePasswordChange} inputProps={{maxLength: "20"}} label="Password" placeholder="Enter password" type="password" variant="outlined" autoComplete="current-password" margin="dense" fullWidth required/>
+      <Button type="submit" color="primary" variant="contained" onClick={handleSubmit} style={buttonstyle} fullWidth>Log in</Button>
+      <Typography>No account yet? <Link component={RouterLink} to="/signup">Sign up</Link></Typography>
+    </Paper>
   );
 };
 

@@ -4,20 +4,22 @@ const ObjectId = require("mongoose");
 // ReadPlates, CreatePlates, UpdatePlates, DeletePlates
 
 const isIterable = object =>
-  object != null && typeof object[Symbol.iterator] === 'function'
+  object != null && typeof object[Symbol.iterator] === 'function';
 
 module.exports.ReadPlates = async (req, res) => {
-  // if empty request, return all plates and username (treat this as a login attempt with token)
-  // otherwise, return select plates
+  await req.user.populate("plates");
+  return res.json({ plates: req.user.plates, username: req.user.username });
+};
+
+module.exports.ReadPlatesSpecific = async (req, res) => {
   if (!isIterable(req.body.IDs)) {
-    await req.user.populate("plates");
-    return res.json({ plates: req.user.plates, username: req.user.username });
+    return res.json({message:"Missing or invalid object `IDs`"});
   }
 
-  const plates = [];
+  const output = [];
   for (let _id of req.body.IDs) {
     if (typeof _id != "string" || !ObjectId.isValidObjectId(_id)) {
-      plates.push({
+      output.push({
         _id,
         reason: "Invalid _id."
       });
@@ -26,7 +28,7 @@ module.exports.ReadPlates = async (req, res) => {
 
     let index = req.user.plates.indexOf(_id);
     if (index == -1) {
-      plates.push({
+      output.push({
         _id,
         reason: "You do not own the specified plate."
       });
@@ -38,7 +40,7 @@ module.exports.ReadPlates = async (req, res) => {
 
     if (!plate) {
       // this might happen when the plate is deleted but the ownership wasn't updated correctly
-      plates.push({
+      output.push({
         _id,
         reason: "You own the specified plate but somehow we could not find the plate' data. Removed the plate from your ownership."
       });
@@ -47,16 +49,16 @@ module.exports.ReadPlates = async (req, res) => {
       continue;
     }
 
-    plates.push(plate);
+    output.push(plate);
   }
 
-  return res.json({ plates });
+  return res.json(output);
 };
 
 module.exports.CreatePlates = async (req, res) => {
   const output = [];
   if (!isIterable(req.body.plates)) {
-    return res.status(400).json({message:"Missing or invalid object `plates`"});
+    return res.json({message:"Missing or invalid object `plates`"});
   }
 
   for (let requestedPlate of req.body.plates) {
@@ -175,7 +177,7 @@ module.exports.UpdatePlates = async (req, res) => {
   const failures = [];
 
   if (!isIterable(req.body.plates)) {
-    return res.status(400).json({message:"Missing or invalid object `plates`"});
+    return res.json({message:"Missing or invalid object `plates`"});
   }
 
   for (let requestedPlate of req.body.plates) {
@@ -292,7 +294,7 @@ module.exports.DeletePlates = async (req, res) => {
   const failures = [];
 
   if (!isIterable(req.body.IDs)) {
-    return res.status(400).json({message:"Missing or invalid object `IDs`"});
+    return res.json({message:"Missing or invalid object `IDs`"});
   }
 
   for (let _id of req.body.IDs) {

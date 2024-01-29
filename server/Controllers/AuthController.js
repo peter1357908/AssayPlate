@@ -11,7 +11,7 @@ module.exports.Signup = async (req, res) => {
     return res.json({message:"Username and password must both be strings."});
   }
   if (!username.match(/^[0-9a-z]+$/)) {
-    return res.json({message:"Username must consist of alphanumerical characters."});
+    return res.json({message:"Username can only contain English letters and numbers."});
   }
   if (username.length > 20) {
     return res.json({message:"Username can have at most 20 characters."});
@@ -35,9 +35,10 @@ module.exports.Signup = async (req, res) => {
     withCredentials: true,
     httpOnly: false,
   });
-  return res
-    .status(201)
-    .json({ message: `User "${username}" signed up successfully. Logged in automatically.`, success: true });
+  return res.json({ 
+    message: `User "${username}" signed up successfully. Logged in automatically.`,
+    success: true
+  });
 };
 
 module.exports.Login = async (req, res) => {
@@ -64,7 +65,8 @@ module.exports.Login = async (req, res) => {
     withCredentials: true,
     httpOnly: false,
   });
-  return res
-    .status(201)
-    .json({ message: `User "${username}" logged in successfully`, success: true });
+  return res.json({
+    message: `User "${username}" logged in successfully`,
+    success: true
+  });
 }
