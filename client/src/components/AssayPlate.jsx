@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-import "./AssayPlate.css";
-
 const AssayPlate = ({ currPlate, setCurrPlate }) => {
 
   // render the current plate

@@ -33,7 +33,6 @@ const TopBar = (props) => {
         return navigate("/login");
       }
       setUsername(data.username);
-      toast(`Hello, ${data.username}!`, { position: "top-right" });
       if (data.plates) {
         setPlatesCache(data.plates);
         setCurrPlate(data.plates[0]);
@@ -55,6 +54,7 @@ const TopBar = (props) => {
 
   const logout = () => {
     removeCookie("token");
+    toast.success("Logged out successfully");
     navigate("/login");
   };
 

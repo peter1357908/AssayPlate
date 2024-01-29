@@ -36,10 +36,10 @@ const Signup = () => {
       );
       const { success, message } = data;
       if (success) {
-        toast.success(message, { position: "bottom-center" });
+        toast.success(message);
         navigate("/");
       } else {
-        toast.error(message, { position: "bottom-center" });
+        toast.error(message);
       }
     } catch (error) {
       console.log(error);

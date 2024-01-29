@@ -11,7 +11,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
       </Routes>
-      <ToastContainer theme={"dark"} autoClose={2000} />
+      <ToastContainer theme="dark" autoClose={2000} position="bottom-center"/>
     </div>
   );
 }
