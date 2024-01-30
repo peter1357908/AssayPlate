@@ -10,7 +10,7 @@ import {
   Button, IconButton,
   Menu, MenuItem, ListItemIcon,
   AppBar, Toolbar,
-  Dialog, DialogTitle, DialogContent, DialogActions,
+  Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText,
   Radio, RadioGroup, FormControl, FormLabel, FormControlLabel,
   Typography,
 } from "@mui/material";
@@ -28,8 +28,8 @@ import ConfirmDialog from "./ConfirmDialog";
 const PlatesURL = `${import.meta.env.VITE_SERVER_URL}/plates`;
 const CreatePlatesURL = `${PlatesURL}/create`;
 const ReadPlatesURL = `${PlatesURL}/read`;
-const UpdatePlates = `${PlatesURL}/update`;
-const DeletePlates = `${PlatesURL}/delete`;
+const UpdatePlatesURL = `${PlatesURL}/update`;
+const DeletePlatesURL = `${PlatesURL}/delete`;
 
 const TopBar = (props) => {
   const { currPlate, setCurrPlate, isModified, setIsModified, cookies, removeCookie } = props;
@@ -76,10 +76,10 @@ const TopBar = (props) => {
     if (isModified) {
       setDropdownChangeCandidate(value);
     } else {
-      onDropdownChangeConfirm(value);
+      handleDropdownChange(value);
     }
   };
-  const onDropdownChangeConfirm = (value) => {
+  const handleDropdownChange = (value) => {
     setSelectedPlate(value);
     setCurrPlate({...value});
     setIsModified(false);
@@ -107,10 +107,6 @@ const TopBar = (props) => {
   const handlenColInput = (e) => { setnColString(e.target.value); }
 
   const handleCreatePlate = async () => {
-    // TODO
-    // if (isModified) {
-    // https://mui.com/material-ui/react-dialog/
-    // }
     if (newPlateName.length < 1) {
       toast.error("Plate Name is required.");
       return
@@ -157,11 +153,12 @@ const TopBar = (props) => {
   }
 
   // DeletePlate ======================
-  const handleDeletePlate = async () => {
-    // TODO: confirmation dialog
+  const [deletionTarget, setDeletionTarget] = useState(null);
+  const onDeletePlate = () => { setDeletionTarget(selectedPlate); };
+  const handleDeletePlate = async (targetPlate) => {
     const { data } = await axios.post(
-      DeletePlates,
-      { IDs: [currPlate._id] },
+      DeletePlatesURL,
+      { IDs: [targetPlate._id] },
       { withCredentials: true }
     );
     if (data.unauthorized) {
@@ -171,9 +168,10 @@ const TopBar = (props) => {
     if (data.failures.legnth > 0) {
       toast.error(data.failures[0].reason);  // should not happen during normal use
     } else {
-      const newPlatesCache = platesCache.filter((plate) => plate._id != currPlate._id);
+      const newPlatesCache = platesCache.filter((plate) => plate._id != targetPlate._id);
       setPlatesCache(newPlatesCache);
       setIsModified(false);
+      setDeletionTarget(null);
       if (newPlatesCache.length > 0) {
         setSelectedPlate(newPlatesCache[0]);
         setCurrPlate({...newPlatesCache[0]});
@@ -231,8 +229,9 @@ const TopBar = (props) => {
       <ConfirmDialog 
         candidate={dropdownChangeCandidate}
         setCandidate={setDropdownChangeCandidate}
-        onConfirm={onDropdownChangeConfirm}
-        actionDescription="changing to another plate"
+        onConfirm={handleDropdownChange}
+        actionTitle="Unsaved changes in current plate"
+        actionDescription={dropdownChangeCandidate ? `Do you wish to discard the changes and change to "${dropdownChangeCandidate.plateName}"?` : "Loading..."}
       />
 
       <Tooltip title="Create new plate">
@@ -240,32 +239,34 @@ const TopBar = (props) => {
           <AddCircleOutlineIcon fontSize="large"/>
         </IconButton>
       </Tooltip>
-
       <Dialog
         open={createPlateDialogIsOpen}
         onClose={closeCreatePlateDialog}
+        maxWidth="xs"
+        fullWidth
       >
         <DialogTitle>New Plate Info</DialogTitle>
         <DialogContent style={{ display: "flex", flexDirection: "column", gap: "2ch" }}>
-          <FormControl>
-            <TextField
-              value={newPlateName}
-              variant="standard"
-              onChange={handleNewPlateNameChange}
-              inputProps={{ maxLength: "20" }}
-              autoFocus
-              onFocus={e => {e.target.select();}}
-              required
-              size="small"
-              autoComplete="off"
-              placeholder="Enter name for new plate"
-              label="Plate Name"
-            />
-          </FormControl>
+          {isModified && <DialogContentText>You have unsaved changes in the current plate! Creating a new plate now will discard those changes.</DialogContentText>}
+          <TextField
+            value={newPlateName}
+            variant="standard"
+            onChange={handleNewPlateNameChange}
+            inputProps={{ maxLength: "20" }}
+            autoFocus
+            onFocus={e => {e.target.select();}}
+            required
+            size="small"
+            autoComplete="off"
+            placeholder="Enter name for new plate"
+            label="Plate Name"
+          />
           
           <FormControl>
             <FormLabel>Size *</FormLabel>
-            <RadioGroup value={sizeString} onChange={handleSizeSelection}>
+            <RadioGroup
+              value={sizeString}
+              onChange={handleSizeSelection}>
               <Box>
                 <FormControlLabel value="8,12" control={<Radio />} label="8 x 12" />
                 <FormControlLabel value="16,24" control={<Radio />} label="16 x 24" />
@@ -306,10 +307,17 @@ const TopBar = (props) => {
       </Dialog>
 
       <Tooltip title="Delete current plate">
-        <span><IconButton disabled={!Boolean(selectedPlate)} onClick={handleDeletePlate} size="small">
+        <span><IconButton disabled={!Boolean(selectedPlate)} onClick={onDeletePlate} size="small">
           <DeleteIcon fontSize="large"/>
         </IconButton></span>
       </Tooltip>
+      <ConfirmDialog 
+        candidate={deletionTarget}
+        setCandidate={setDeletionTarget}
+        onConfirm={handleDeletePlate}
+        actionTitle="Confirm Deletion"
+        actionDescription={deletionTarget ? `Delete plate "${deletionTarget.plateName}"? This cannot be undone.` : "Loading..."}
+      />
     </Box>
     
     <Box>

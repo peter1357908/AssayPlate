@@ -5,16 +5,18 @@ import {
 // a reusable dialog for confirming whether the user wants to discard
 // any changes and proceed with their chosen action
 const ConfirmDialog = (props) => {
-  const { candidate, setCandidate, onConfirm, actionDescription } = props;
+  const { candidate, setCandidate, onConfirm, actionTitle, actionDescription } = props;
   return (
     <Dialog
       open={Boolean(candidate)}
       onClose={() => setCandidate(null)}
+      fullWidth
+      maxWidth="xs"
     >
-      <DialogTitle>Discard changes?</DialogTitle>
+      <DialogTitle>{actionTitle}</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          You have unsaved changes. Do you wish to discard the changes and proceed with {actionDescription}?
+          {actionDescription}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
