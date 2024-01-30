@@ -12,6 +12,7 @@ import {
   AppBar, Toolbar,
   Dialog, DialogTitle, DialogContent, DialogActions,
   Radio, RadioGroup, FormControl, FormLabel, FormControlLabel,
+  Typography,
 } from "@mui/material";
 import { 
   Logout as LogoutIcon,
@@ -94,20 +95,21 @@ const TopBar = (props) => {
   const [sizeString, setSizeString] = useState("8,12");
   const [nRowString, setnRowString] = useState("8");
   const [nColString, setnColString] = useState("12");
-  const[customSizeInputSelected, setCustomSizeInputSelected] = useState(false);
-  const handleSizeSelection = (e) => {
-    if (e.target.value === "Custom") {
-      setCustomSizeInputSelected(true);
-    } else {
-      setCustomSizeInputSelected(false);
-    }
-    setSizeString(e.target.value);
+  const handleSizeSelection = (e) => { setSizeString(e.target.value); };
+  const handleSizeInputFocus = (e) => { 
+    e.target.select();
+    setSizeString("Custom");
   };
 
   const handlenRowInput = (e) => { setnRowString(e.target.value); }
   const handlenColInput = (e) => { setnColString(e.target.value); }
 
   const handleCreatePlate = async () => {
+    if (newPlateName.length < 1) {
+      toast.error("Plate Name is required.");
+      return
+    }
+
     let nRow, nCol;
     if (sizeString === "Custom") {
       nRow = parseInt(nRowString);
@@ -183,17 +185,18 @@ const TopBar = (props) => {
     removeCookie("token");  // will trigger the `cookies` dependence and cause redirection
     toast.success("Logged out successfully");
   };
-  
-  // RENDERS ----------------------------------------------
 
   return (
-    <AppBar position="static"><Toolbar>
-      <Autocomplete 
-        style={{ width: 280 }}
+    <AppBar position="static" style={{ backgroundColor: "orange" }}>
+    <Toolbar style={{ justifyContent: "space-between" }}>
+    <Box style={{ display: "flex" }}>
+    <Autocomplete 
+        style={{ width: "28ch" }}
         options={platesCache}
         autoHighlight
         disableClearable
         value={currPlate}
+        onChange={onDropdownChange}
         getOptionKey={(plate) => plate._id}
         getOptionLabel={(plate) => plate.plateName || ""}
         renderOption={(props, option) => (
@@ -201,11 +204,11 @@ const TopBar = (props) => {
             {option.plateName} ({option.nRow}x{option.nCol})
           </Box>
         )}
-        onChange={onDropdownChange}
         renderInput={(params) => (
           <TextField
             {...params}
             label="Choose a plate"
+            variant="standard"
             inputProps={{
               ...params.inputProps,
               autoComplete: "off"
@@ -225,31 +228,57 @@ const TopBar = (props) => {
         onClose={closeCreatePlateDialog}
       >
         <DialogTitle>New Plate Info</DialogTitle>
-        <DialogContent>
-          <TextField
-            value={newPlateName}
-            onChange={handleNewPlateNameChange}
-            inputProps={{ maxLength: "20" }}
-            autoFocus
-            onFocus={e => {e.target.select();}}
-            required
-            autoComplete="off"
-            placeholder="Enter name for new plate"
-            label="Plate Name"
-          />
+        <DialogContent style={{ display: "flex", flexDirection: "column", gap: "2ch" }}>
           <FormControl>
-            <FormLabel>Size</FormLabel>
+            <TextField
+              value={newPlateName}
+              variant="standard"
+              onChange={handleNewPlateNameChange}
+              inputProps={{ maxLength: "20" }}
+              autoFocus
+              onFocus={e => {e.target.select();}}
+              required
+              size="small"
+              autoComplete="off"
+              placeholder="Enter name for new plate"
+              label="Plate Name"
+            />
+          </FormControl>
+          
+          <FormControl>
+            <FormLabel>Size *</FormLabel>
             <RadioGroup value={sizeString} onChange={handleSizeSelection}>
-              <FormControlLabel value="8,12" control={<Radio />} label="8 x 12" />
-              <FormControlLabel value="16,24" control={<Radio />} label="16 x 24" />
-              <FormControlLabel value="Custom" control={<Radio />} label="Custom" />
-            </RadioGroup>
-            {customSizeInputSelected && (
               <Box>
-                <TextField value={nRowString} onChange={handlenRowInput} inputProps={{maxLength: "2"}} label="Rows" variant="outlined" required/>
-                <TextField value={nColString} onChange={handlenColInput} inputProps={{maxLength: "2"}} label="Cols" variant="outlined" required/>
+                <FormControlLabel value="8,12" control={<Radio />} label="8 x 12" />
+                <FormControlLabel value="16,24" control={<Radio />} label="16 x 24" />
               </Box>
-            )}
+              <Box style={{ display: "flex", alignItems: "center" }}>
+                <FormControlLabel value="Custom" control={<Radio />} label="Custom:" />
+                <TextField
+                  style={{ width: "2ch", marginRight: "1ch" }}
+                  onFocus={handleSizeInputFocus}
+                  value={nRowString}
+                  onChange={handlenRowInput}
+                  inputProps={{maxLength: "2"}}
+                  variant="standard"
+                  size="small"
+                  autoComplete="off"
+                  required
+                />
+                <Typography>x</Typography>
+                <TextField
+                  style={{ width: "2ch", marginLeft: "1ch" }}
+                  onFocus={handleSizeInputFocus}
+                  value={nColString}
+                  onChange={handlenColInput}
+                  inputProps={{maxLength: "2"}}
+                  variant="standard"
+                  size="small"
+                  autoComplete="off"
+                  required
+                />
+              </Box>
+            </RadioGroup>
           </FormControl>
         </DialogContent>
         <DialogActions>
@@ -263,7 +292,9 @@ const TopBar = (props) => {
           <DeleteIcon fontSize="large"/>
         </IconButton>
       </Tooltip>
-      
+    </Box>
+    
+    <Box>
       <Tooltip title={`User: ${username}`}>
         <IconButton onClick={openProfileMenu} size="small">
           <AccountCircleIcon fontSize="large" />
@@ -284,7 +315,9 @@ const TopBar = (props) => {
           Logout
         </MenuItem>
       </Menu>
-    </Toolbar></AppBar>
+    </Box>  
+    </Toolbar>
+    </AppBar>
   )
 };
 
