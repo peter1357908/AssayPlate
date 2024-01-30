@@ -1,8 +1,9 @@
 import { useState } from "react";
 import TopBar from "../components/TopBar";
 import AssayPlate from "../components/AssayPlate";
+import Box from "@mui/material/Box";
 
-const Home = () => {
+const Home = (props) => {
   const [currPlate, setCurrPlate] = useState({});
   const [isModified, setIsModified] = useState(false);
 
@@ -11,10 +12,17 @@ const Home = () => {
   };
 
   return (
-    <div className="home-page">
-      <TopBar {...sharedProps} />
+    <Box style={{
+      display: "flex",
+      height: "100vh",
+      width: "100vw",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "space-between"
+      }}>
+      <TopBar {...sharedProps} {...props} />
       <AssayPlate {...sharedProps} />
-    </div>
+    </Box>
   );
 };
 

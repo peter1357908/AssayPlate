@@ -3,15 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Autocomplete, TextField, Typography } from '@mui/material';
+import { Autocomplete, TextField, Box, Tooltip, IconButton, Menu, MenuItem, ListItemIcon, AppBar, Toolbar } from '@mui/material';
+import { Logout as LogoutIcon, AccountCircle as AccountCircleIcon }  from '@mui/icons-material';
 
 const platesURL = `${import.meta.env.VITE_SERVER_URL}/plates`;
 const platesSpecificURL = `${platesURL}/specific`;
 
 const TopBar = (props) => {
-  const { currPlate, setCurrPlate, isModified, setIsModified } = props;
+  const { currPlate, setCurrPlate, isModified, setIsModified, cookies, removeCookie } = props;
   const navigate = useNavigate();
-  const [cookies, removeCookie] = useCookies(["token"]);
   const [username, setUsername] = useState("");
   const [platesCache, setPlatesCache] = useState([]);
 
@@ -45,27 +45,32 @@ const TopBar = (props) => {
 
   // swap the current plate; warn about discarding changes if applicable
   const onDropdownChange = (event, value) => {
-    console.log(value._id);
-    if (currPlate && event.target.value === currPlate._id) { return; }
+    if (currPlate && value._id === currPlate._id) { return; }
+    // TODO
     // if (isModified) {
-
+    // https://mui.com/material-ui/react-dialog/
     // }
-
-    // for (let plate of platesCache) {
-    //   if (plate._id === event.target.value) {
-    //     setCurrPlate(plate);
-    //     break;
-    //   }
-    // }
+    setCurrPlate(value);
   };
 
-  const logout = () => {
-    removeCookie("token");
+  const handleLogout = () => {
+    // TODO
+    // if (isModified) {
+    // https://mui.com/material-ui/react-dialog/
+    // }
+    removeCookie("token");  // will trigger the `cookies` dependence and cause redirection
     toast.success("Logged out successfully");
-    navigate("/login");
   };
 
-  const handleButtonClick = () => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const handleProfileIconClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  }
+  const handleProfileMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleButtonClickPlaceholder = () => {
     // Handle button click logic
     toast.info('Button clicked!');
   };
@@ -73,14 +78,19 @@ const TopBar = (props) => {
   // RENDERS ----------------------------------------------
 
   return (
-    <div className="top-bar">
+    <AppBar position="static"><Toolbar sx={{ width: "100%" }}>
       <Autocomplete 
-        style={{ width: 250 }}
+        style={{ width: 280 }}
         options={platesCache}
         autoHighlight
         disableClearable
         getOptionKey={(plate) => plate._id}
         getOptionLabel={(plate) => plate.plateName}
+        renderOption={(props, option) => (
+          <Box component="li" {...props}>
+            {option.plateName} ({option.nRow}x{option.nCol})
+          </Box>
+        )}
         onChange={onDropdownChange}
         renderInput={(params) => (
           <TextField
@@ -93,12 +103,32 @@ const TopBar = (props) => {
           />
         )}
       />
-      <button onClick={handleButtonClick}>Button 1</button>
-      <button onClick={handleButtonClick}>Button 2</button>
-
-      <Typography>{username}</Typography>
-      <button id="logout" onClick={logout}>LOGOUT</button>
-    </div>
+      <button onClick={handleButtonClickPlaceholder}>Button 1</button>
+      <button onClick={handleButtonClickPlaceholder}>Button 2</button>
+      
+      <Tooltip title={username}>
+        <IconButton
+          onClick={handleProfileIconClick}
+          size="small"
+        >
+          <AccountCircleIcon fontSize="large" />
+        </IconButton>
+      </Tooltip>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleProfileMenuClose}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+      >
+        <MenuItem onClick={handleLogout}>
+          <ListItemIcon>
+            <LogoutIcon fontSize="small" />
+          </ListItemIcon>
+          Logout
+        </MenuItem>
+      </Menu>
+    </Toolbar></AppBar>
   )
 };
 

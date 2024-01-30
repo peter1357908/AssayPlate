@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { useCookies } from "react-cookie";
+import { Cookies } from "react-cookie";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Paper, Avatar, TextField, Button, Typography, Link } from "@mui/material";
 import LockPersonIcon from "@mui/icons-material/LockPerson";
 
-const Login = () => {
+const Login = ({ cookies }) => {
   const navigate = useNavigate();
   
   // if a token already exists, just navigate to the home page.
-  const [cookies] = useCookies(["token"]);
   useEffect(() => {
     if (cookies.token && cookies.token != "undefined") {
       navigate("/");

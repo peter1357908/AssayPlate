@@ -6,11 +6,10 @@ import { toast } from "react-toastify";
 import { Paper, Avatar, TextField, Button, Typography, Link } from "@mui/material";
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
-const Signup = () => {
+const Signup = ({ cookies }) => {
   const navigate = useNavigate();
   
   // if a token already exists, just navigate to the home page.
-  const [cookies] = useCookies(["token"]);
   useEffect(() => {
     if (cookies.token && cookies.token != "undefined") {
       navigate("/");
