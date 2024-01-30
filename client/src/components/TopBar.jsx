@@ -153,6 +153,44 @@ const TopBar = (props) => {
     closeCreatePlateDialog();
   }
 
+  // SyncPlate ========================
+  
+  // helper for SyncPlate, UpdatePlate. Expect a fresh copy
+  // e.g., shouldn't pass in `currPlate` directly
+  // does NOT update `currPlate`, because only SyncPlate needs it
+  const updateCachedPlate = (updatedPlateCache) => {
+    const newPlatesCache = platesCache.map((plate) => {
+      if (plate._id != updatedPlateCache._id) {
+        return {...plate};
+      } else {
+        return updatedPlateCache;
+      }
+    });
+    setPlatesCache(newPlatesCache);
+    setSelectedPlate(updatedPlateCache);
+    setIsModified(false);
+  }
+
+  const handleSyncPlate = async () => {
+    // TODO: warn about modification
+    const { data } = await axios.post(
+      ReadPlatesURL,
+      { IDs: [currPlate._id] },
+      { withCredentials: true }
+    );
+    if (data.unauthorized) {
+      removeCookie("token");
+      return navigate("/login");
+    }
+    const result = data.output[0];
+    if (result.reason) {
+      // should not happen during normal use
+      return toast.error(result.reason);
+    }
+    updateCachedPlate(result);
+    setCurrPlate({...result});
+  }
+
   // SavePlate ========================
   const handleSavePlate = async () => {
     // NOTE: the button should be disabled if the plate is unmodified
@@ -170,18 +208,14 @@ const TopBar = (props) => {
       // should not happen during normal use
       return toast.error(data.failures[0].reason);
     }
+    updateCachedPlate({...currPlate});
+  }
 
-    const updatedPlateCache = {...currPlate};
-    const newPlatesCache = platesCache.map((plate) => {
-      if (plate._id != currPlate._id) {
-        return {...plate};
-      } else {
-        return updatedPlateCache;
-      }
-    });
-    setPlatesCache(newPlatesCache);
-    setSelectedPlate(updatedPlateCache);
-    setIsModified(false);
+  // RestorePlate =======================
+  const handleRestorePlate = async () => {
+    // TODO: warn about modification
+    // NOTE: the button should be disabled if the plate is unmodified
+    setCurrPlate({...selectedPlate});
   }
 
   // DeletePlate ======================
@@ -339,9 +373,21 @@ const TopBar = (props) => {
         </DialogActions>
       </Dialog>
 
-      <Tooltip title="Save current plate and upload to Cloud">
+      <Tooltip title="Sync current plate with the cloud's copy">
+        <span><IconButton onClick={handleSyncPlate} size="small">
+          <CloudDownloadIcon fontSize="large"/>
+        </IconButton></span>
+      </Tooltip>
+
+      <Tooltip title="Save current plate and upload to cloud">
         <span><IconButton disabled={!isModified} onClick={handleSavePlate} size="small">
           <SaveIcon fontSize="large"/>
+        </IconButton></span>
+      </Tooltip>
+
+      <Tooltip title="Restore current plate to last save">
+        <span><IconButton disabled={!isModified} onClick={handleRestorePlate} size="small">
+          <RestoreIcon fontSize="large"/>
         </IconButton></span>
       </Tooltip>
 
