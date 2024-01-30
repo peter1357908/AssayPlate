@@ -55,8 +55,8 @@ module.exports.CreatePlates = async (req, res) => {
       let failureReason = null;
       for (let well of wells) {
         let { reagent, antibody, concentration } = well;
-        if (typeof reagent != "string" || !reagent.match(/^R\d+$/)) {
-          failureReason = `reagent "${reagent}" is invalid! It must be a string that starts with "R" and followed by numbers.`;
+        if (typeof reagent != "string" || (reagent.length > 0 && !reagent.match(/^R\d+$/))) {
+          failureReason = `reagent "${reagent}" is invalid! It must be either an emtpy string or one that starts with "R" and followed by numbers.`;
           break;
         }
         if (typeof antibody != "string") {
@@ -242,8 +242,8 @@ module.exports.UpdatePlates = async (req, res) => {
       let failureReason = null;
       for (let well of wells) {
         let { reagent, antibody, concentration } = well;
-        if (typeof reagent != "string" || !reagent.match(/^R\d+$/)) {
-          failureReason = `reagent "${reagent}" is invalid! It must be a string that starts with "R" and followed by numbers.`;
+        if (typeof reagent != "string" || (reagent.length > 0 && !reagent.match(/^R\d+$/))) {
+          failureReason = `reagent "${reagent}" is invalid! It must be either an emtpy string or one that starts with "R" and followed by numbers.`;
           break;
         }
         if (typeof antibody != "string") {

@@ -20,7 +20,7 @@ import {
   Delete as DeleteIcon,
   AddCircleOutline as AddCircleOutlineIcon,
   CloudDownload as CloudDownloadIcon,
-  CloudUpload as CloudUploadIcon,
+  Save as SaveIcon,
   Restore as RestoreIcon
 }  from "@mui/icons-material";
 import ConfirmDialog from "./ConfirmDialog";
@@ -142,14 +142,46 @@ const TopBar = (props) => {
     }
     const result = data.output[0];
     if (!result.isCreated) {
-      toast.error(result.reason);  // should not happen during normal use
-    } else {
-      setIsModified(false);
-      setSelectedPlate(result.newPlate);
-      setCurrPlate({...result.newPlate});
-      setPlatesCache([...platesCache, result.newPlate]);
+      // should not happen during normal use
+      return toast.error(result.reason);
     }
+
+    setIsModified(false);
+    setSelectedPlate(result.newPlate);
+    setCurrPlate({...result.newPlate});
+    setPlatesCache([...platesCache, result.newPlate]);
     closeCreatePlateDialog();
+  }
+
+  // SavePlate ========================
+  const handleSavePlate = async () => {
+    // NOTE: the button should be disabled if the plate is unmodified
+    // Also assumes that input validation is done at the AssayPlate level
+    const { data } = await axios.post(
+      UpdatePlatesURL,
+      { plates: [currPlate] },
+      { withCredentials: true }
+    );
+    if (data.unauthorized) {
+      removeCookie("token");
+      return navigate("/login");
+    }
+    if (data.failures.legnth > 0) {
+      // should not happen during normal use
+      return toast.error(data.failures[0].reason);
+    }
+
+    const updatedPlateCache = {...currPlate};
+    const newPlatesCache = platesCache.map((plate) => {
+      if (plate._id != currPlate._id) {
+        return {...plate};
+      } else {
+        return updatedPlateCache;
+      }
+    });
+    setPlatesCache(newPlatesCache);
+    setSelectedPlate(updatedPlateCache);
+    setIsModified(false);
   }
 
   // DeletePlate ======================
@@ -166,19 +198,20 @@ const TopBar = (props) => {
       return navigate("/login");
     }
     if (data.failures.legnth > 0) {
-      toast.error(data.failures[0].reason);  // should not happen during normal use
+      // should not happen during normal use
+      return toast.error(data.failures[0].reason);
+    }
+
+    const newPlatesCache = platesCache.filter((plate) => plate._id != targetPlate._id);
+    setPlatesCache(newPlatesCache);
+    setIsModified(false);
+    setDeletionTarget(null);
+    if (newPlatesCache.length > 0) {
+      setSelectedPlate(newPlatesCache[0]);
+      setCurrPlate({...newPlatesCache[0]});
     } else {
-      const newPlatesCache = platesCache.filter((plate) => plate._id != targetPlate._id);
-      setPlatesCache(newPlatesCache);
-      setIsModified(false);
-      setDeletionTarget(null);
-      if (newPlatesCache.length > 0) {
-        setSelectedPlate(newPlatesCache[0]);
-        setCurrPlate({...newPlatesCache[0]});
-      } else {
-        setSelectedPlate(null);
-        setCurrPlate(null);
-      }
+      setSelectedPlate(null);
+      setCurrPlate(null);
     }
   }
 
@@ -305,6 +338,12 @@ const TopBar = (props) => {
           <Button onClick={handleCreatePlate}>Create</Button>
         </DialogActions>
       </Dialog>
+
+      <Tooltip title="Save current plate and upload to Cloud">
+        <span><IconButton disabled={!isModified} onClick={handleSavePlate} size="small">
+          <SaveIcon fontSize="large"/>
+        </IconButton></span>
+      </Tooltip>
 
       <Tooltip title="Delete current plate">
         <span><IconButton disabled={!Boolean(selectedPlate)} onClick={onDeletePlate} size="small">
