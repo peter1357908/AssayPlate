@@ -58,7 +58,6 @@ module.exports.Login = async (req, res) => {
   }
   const auth = await bcrypt.compare(password, user.password)
   if (!auth) {
-    console.log("actually incorrect password... but how??");
     return res.json({message:"Incorrect password or username" }); 
   }
   const token = createSecretToken(user._id);

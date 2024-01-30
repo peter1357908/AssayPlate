@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { Cookies } from "react-cookie";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Paper, Avatar, TextField, Button, Typography, Link } from "@mui/material";

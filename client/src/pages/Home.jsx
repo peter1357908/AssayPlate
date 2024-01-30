@@ -4,7 +4,7 @@ import AssayPlate from "../components/AssayPlate";
 import Box from "@mui/material/Box";
 
 const Home = (props) => {
-  const [currPlate, setCurrPlate] = useState({});
+  const [currPlate, setCurrPlate] = useState(null);
   const [isModified, setIsModified] = useState(false);
 
   const sharedProps = {

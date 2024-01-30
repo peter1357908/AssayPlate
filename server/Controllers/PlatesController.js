@@ -1,58 +1,14 @@
 const Plate = require("../Models/PlateModel");
 const ObjectId = require("mongoose");
 
-// ReadPlates, CreatePlates, UpdatePlates, DeletePlates
+// CreatePlates, ReadPlates, UpdatePlates, DeletePlates
 
 const isIterable = object =>
   object != null && typeof object[Symbol.iterator] === 'function';
 
-module.exports.ReadPlates = async (req, res) => {
+module.exports.GetPlatesAndUsername = async (req, res) => {
   await req.user.populate("plates");
   return res.json({ plates: req.user.plates, username: req.user.username });
-};
-
-module.exports.ReadPlatesSpecific = async (req, res) => {
-  if (!isIterable(req.body.IDs)) {
-    return res.json({message:"Missing or invalid object `IDs`"});
-  }
-
-  const output = [];
-  for (let _id of req.body.IDs) {
-    if (typeof _id != "string" || !ObjectId.isValidObjectId(_id)) {
-      output.push({
-        _id,
-        reason: "Invalid _id."
-      });
-      continue;
-    }
-
-    let index = req.user.plates.indexOf(_id);
-    if (index == -1) {
-      output.push({
-        _id,
-        reason: "You do not own the specified plate."
-      });
-      continue;
-    }
-
-    // then, try to find the plate
-    let plate = await Plate.findById(_id);
-
-    if (!plate) {
-      // this might happen when the plate is deleted but the ownership wasn't updated correctly
-      output.push({
-        _id,
-        reason: "You own the specified plate but somehow we could not find the plate' data. Removed the plate from your ownership."
-      });
-      req.user.plates.splice(index, 1);
-      try { await req.user.save(); } catch (err) { console.log(err); }
-      continue;
-    }
-
-    output.push(plate);
-  }
-
-  return res.json(output);
 };
 
 module.exports.CreatePlates = async (req, res) => {
@@ -90,7 +46,7 @@ module.exports.CreatePlates = async (req, res) => {
       if (!Array.isArray(wells) || nCol * nRow != wells.length) {
         output.push({
           isCreated: false,
-          reason: "`wells` must be an array of length equaling `nCol * nRow`."
+          reason: "`wells` must be either undefined or an array of length equaling `nCol * nRow`."
         });
         continue;
       }
@@ -163,14 +119,59 @@ module.exports.CreatePlates = async (req, res) => {
       });
       continue;
     }
-
+    
+    // for convenience and good practice, return the entire new plate rather than just the _id
     output.push({
       isCreated: true,
-      _id: newPlate._id,
+      newPlate
     })
   }
   
-  return res.json(output);
+  return res.json({ output });
+};
+
+module.exports.ReadPlates = async (req, res) => {
+  if (!isIterable(req.body.IDs)) {
+    return res.json({message:"Missing or invalid object `IDs`"});
+  }
+
+  const output = [];
+  for (let _id of req.body.IDs) {
+    if (typeof _id != "string" || !ObjectId.isValidObjectId(_id)) {
+      output.push({
+        _id,
+        reason: "Invalid _id."
+      });
+      continue;
+    }
+
+    let index = req.user.plates.indexOf(_id);
+    if (index == -1) {
+      output.push({
+        _id,
+        reason: "You do not own the specified plate."
+      });
+      continue;
+    }
+
+    // then, try to find the plate
+    let plate = await Plate.findById(_id);
+
+    if (!plate) {
+      // this might happen when the plate is deleted but the ownership wasn't updated correctly
+      output.push({
+        _id,
+        reason: "You own the specified plate but somehow we could not find the plate' data. Removed the plate from your ownership."
+      });
+      req.user.plates.splice(index, 1);
+      try { await req.user.save(); } catch (err) { console.log(err); }
+      continue;
+    }
+
+    output.push(plate);
+  }
+
+  return res.json({ output });
 };
 
 module.exports.UpdatePlates = async (req, res) => {
@@ -231,7 +232,7 @@ module.exports.UpdatePlates = async (req, res) => {
       if (!Array.isArray(wells) || plate.nCol * plate.nRow != wells.length) {
         failures.push({
           _id,
-          reason: "`wells` must be an array of length equaling `nCol * nRow`."
+          reason: "`wells` must be either undefined or an array of length equaling `nCol * nRow`."
         });
         continue;
       }
@@ -287,7 +288,7 @@ module.exports.UpdatePlates = async (req, res) => {
     }
   }
   
-  return res.json(failures);
+  return res.json({ failures });
 };
 
 module.exports.DeletePlates = async (req, res) => {
@@ -330,5 +331,5 @@ module.exports.DeletePlates = async (req, res) => {
     }
   }
   
-  return res.json(failures);
+  return res.json({ failures });
 };
