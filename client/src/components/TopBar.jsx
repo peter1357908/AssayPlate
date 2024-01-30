@@ -23,22 +23,13 @@ import {
   CloudUpload as CloudUploadIcon,
   Restore as RestoreIcon
 }  from "@mui/icons-material";
+import ConfirmDialog from "./ConfirmDialog";
 
 const PlatesURL = `${import.meta.env.VITE_SERVER_URL}/plates`;
 const CreatePlatesURL = `${PlatesURL}/create`;
 const ReadPlatesURL = `${PlatesURL}/read`;
 const UpdatePlates = `${PlatesURL}/update`;
 const DeletePlates = `${PlatesURL}/delete`;
-
-axios.interceptors.response.use(function (response) {
-  // Any status code that lie within the range of 2xx cause this function to trigger
-  // Do something with response data
-  return response;
-}, function (error) {
-  // Any status codes that falls outside the range of 2xx cause this function to trigger
-  // Do something with response error
-  return Promise.reject(error);
-});
 
 const TopBar = (props) => {
   const { currPlate, setCurrPlate, isModified, setIsModified, cookies, removeCookie } = props;
@@ -50,6 +41,7 @@ const TopBar = (props) => {
 
   // on first render or any cookie change, fetch all plates and set current plate
   // to be the first plate if possible. Redirect to login as necessary.
+  const [selectedPlate, setSelectedPlate] = useState(null);
   useEffect(() => {
     const verifyCookie = async () => {
       if (!cookies.token || cookies.token === "undefined") {
@@ -65,8 +57,10 @@ const TopBar = (props) => {
       }
       setUsername(data.username);
       if (data.plates.length > 0) {
+        setIsModified(false);
         setPlatesCache(data.plates);
-        setCurrPlate(data.plates[0]);
+        setSelectedPlate(data.plates[0]);
+        setCurrPlate({...data.plates[0]});
       }
     };
     verifyCookie();
@@ -74,17 +68,25 @@ const TopBar = (props) => {
 
   // ACTIONS ----------------------------------------------
 
-  // swap the current plate; warn about discarding changes if applicable
+  // Plate Selection Dropdown =========
+  const [dropdownChangeCandidate, setDropdownChangeCandidate] = useState(null);
   const onDropdownChange = (e, value) => {
-    if (currPlate && value._id === currPlate._id) { return; }
-    // TODO
-    // if (isModified) {
-    // https://mui.com/material-ui/react-dialog/
-    // }
-    setCurrPlate(value);
+    if (selectedPlate && value._id === selectedPlate._id) { return; }
+
+    if (isModified) {
+      setDropdownChangeCandidate(value);
+    } else {
+      onDropdownChangeConfirm(value);
+    }
+  };
+  const onDropdownChangeConfirm = (value) => {
+    setSelectedPlate(value);
+    setCurrPlate({...value});
+    setIsModified(false);
+    setDropdownChangeCandidate(null);
   };
 
-  // CreatePlate Stuff ==================
+  // CreatePlate ======================
   const [createPlateDialogIsOpen, setCreatePlateDialogIsOpen] = useState(false);
   const openCreatePlateDialog = () => { setCreatePlateDialogIsOpen(true); };
   const closeCreatePlateDialog = () => { setCreatePlateDialogIsOpen(false); };
@@ -105,6 +107,10 @@ const TopBar = (props) => {
   const handlenColInput = (e) => { setnColString(e.target.value); }
 
   const handleCreatePlate = async () => {
+    // TODO
+    // if (isModified) {
+    // https://mui.com/material-ui/react-dialog/
+    // }
     if (newPlateName.length < 1) {
       toast.error("Plate Name is required.");
       return
@@ -142,14 +148,17 @@ const TopBar = (props) => {
     if (!result.isCreated) {
       toast.error(result.reason);  // should not happen during normal use
     } else {
-      setCurrPlate(result.newPlate);
+      setIsModified(false);
+      setSelectedPlate(result.newPlate);
+      setCurrPlate({...result.newPlate});
       setPlatesCache([...platesCache, result.newPlate]);
     }
     closeCreatePlateDialog();
   }
 
-  // DeletePlate Stuff ==================
+  // DeletePlate ======================
   const handleDeletePlate = async () => {
+    // TODO: confirmation dialog
     const { data } = await axios.post(
       DeletePlates,
       { IDs: [currPlate._id] },
@@ -164,15 +173,18 @@ const TopBar = (props) => {
     } else {
       const newPlatesCache = platesCache.filter((plate) => plate._id != currPlate._id);
       setPlatesCache(newPlatesCache);
+      setIsModified(false);
       if (newPlatesCache.length > 0) {
-        setCurrPlate(newPlatesCache[0]);
+        setSelectedPlate(newPlatesCache[0]);
+        setCurrPlate({...newPlatesCache[0]});
       } else {
+        setSelectedPlate(null);
         setCurrPlate(null);
       }
     }
   }
 
-  // Profile Menu Stuff ==================
+  // Profile Menu ======================
   const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState(null);
   const openProfileMenu = (e) => { setProfileMenuAnchorEl(e.currentTarget); }
   const closeProfileMenu = () => { setProfileMenuAnchorEl(null); };
@@ -190,12 +202,12 @@ const TopBar = (props) => {
     <AppBar position="static" style={{ backgroundColor: "orange" }}>
     <Toolbar style={{ justifyContent: "space-between" }}>
     <Box style={{ display: "flex" }}>
-    <Autocomplete 
+      <Autocomplete 
         style={{ width: "28ch" }}
         options={platesCache}
         autoHighlight
         disableClearable
-        value={currPlate}
+        value={selectedPlate}
         onChange={onDropdownChange}
         getOptionKey={(plate) => plate._id}
         getOptionLabel={(plate) => plate.plateName || ""}
@@ -215,6 +227,12 @@ const TopBar = (props) => {
             }}
           />
         )}
+      />
+      <ConfirmDialog 
+        candidate={dropdownChangeCandidate}
+        setCandidate={setDropdownChangeCandidate}
+        onConfirm={onDropdownChangeConfirm}
+        actionDescription="changing to another plate"
       />
 
       <Tooltip title="Create new plate">
@@ -259,7 +277,7 @@ const TopBar = (props) => {
                   onFocus={handleSizeInputFocus}
                   value={nRowString}
                   onChange={handlenRowInput}
-                  inputProps={{maxLength: "2"}}
+                  inputProps={{ maxLength: "2" }}
                   variant="standard"
                   size="small"
                   autoComplete="off"
@@ -271,7 +289,7 @@ const TopBar = (props) => {
                   onFocus={handleSizeInputFocus}
                   value={nColString}
                   onChange={handlenColInput}
-                  inputProps={{maxLength: "2"}}
+                  inputProps={{ maxLength: "2" }}
                   variant="standard"
                   size="small"
                   autoComplete="off"
@@ -288,9 +306,9 @@ const TopBar = (props) => {
       </Dialog>
 
       <Tooltip title="Delete current plate">
-        <IconButton onClick={handleDeletePlate} size="small">
+        <span><IconButton disabled={!Boolean(selectedPlate)} onClick={handleDeletePlate} size="small">
           <DeleteIcon fontSize="large"/>
-        </IconButton>
+        </IconButton></span>
       </Tooltip>
     </Box>
     

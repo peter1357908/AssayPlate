@@ -1,7 +1,16 @@
+import {
+  Box,
+  Typography,
+  TextField
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-const AssayPlate = ({ currPlate, setCurrPlate }) => {
+const rowLabels = "ABCDEFGHIJKLMNOP";  // QRSTUVWXYZ
+
+const AssayPlate = (props) => {
+  const { currPlate, setCurrPlate, isModified, setIsModified } = props;
+  
 
   // render the current plate
   // const renderCells = () => {
@@ -23,15 +32,37 @@ const AssayPlate = ({ currPlate, setCurrPlate }) => {
   //   }
   //   return cells;
   // };
+  
+  // ACTIONS ----------------------------------------------
+  const handleNameChange = (e) => {
+    setIsModified(true);
+    setCurrPlate({
+      ...currPlate,
+      plateName: e.target.value
+    });
+  }
+
+  // STYLING ----------------------------------------------
+  const boxStyle = {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexGrow: 1
+  };
 
   return (
-    <>
-      <div className="assay-plate">
-        <h4>
-          Selected plate: {currPlate ? currPlate.plateName : "(no currPlate)"}
-        </h4>
-      </div>
-    </>
+    <Box style={boxStyle}>
+      <TextField
+        style={{ width: "20ch" }}
+        disabled={!Boolean(currPlate)}
+        value={currPlate ? currPlate.plateName : "(no plate selected)"}
+        onChange={handleNameChange}
+        inputProps={{ maxLength: "20" }}
+        variant="outlined"
+        size="small"
+        autoComplete="off"
+      />
+    </Box>
   );
 };
 
