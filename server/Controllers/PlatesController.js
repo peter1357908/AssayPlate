@@ -71,7 +71,7 @@ module.exports.CreatePlates = async (req, res) => {
           failureReason = `concentration "${concentration}" is invalid! It must be 0 without an antibody.`;
           break;
         }
-        if (currCol == nCol) {
+        if (currCol === nCol) {
           currCol = 1;
           currRow += 1;
         } else {
@@ -146,7 +146,7 @@ module.exports.ReadPlates = async (req, res) => {
     }
 
     let index = req.user.plates.indexOf(_id);
-    if (index == -1) {
+    if (index === -1) {
       output.push({
         _id,
         reason: "You do not own the specified plate."
@@ -193,7 +193,7 @@ module.exports.UpdatePlates = async (req, res) => {
     }
 
     let index = req.user.plates.indexOf(_id);
-    if (index == -1) {
+    if (index === -1) {
       failures.push({
         _id,
         reason: "You do not own the specified plate."
@@ -258,7 +258,7 @@ module.exports.UpdatePlates = async (req, res) => {
           failureReason = `concentration "${concentration}" is invalid! It must be 0 without an antibody.`;
           break;
         }
-        if (currCol == plate.nCol) {
+        if (currCol === plate.nCol) {
           currCol = 1;
           currRow += 1;
         } else {
@@ -308,7 +308,7 @@ module.exports.DeletePlates = async (req, res) => {
     }
 
     let index = req.user.plates.indexOf(_id);
-    if (index == -1) {
+    if (index === -1) {
       failures.push({
         _id,
         reason: "You do not own the specified plate."

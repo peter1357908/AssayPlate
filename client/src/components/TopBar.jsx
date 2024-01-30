@@ -7,13 +7,12 @@ import {
   TextField,
   Box,
   Tooltip,
-  IconButton,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  AppBar,
-  Toolbar
-} from '@mui/material';
+  Button, IconButton,
+  Menu, MenuItem, ListItemIcon,
+  AppBar, Toolbar,
+  Dialog, DialogTitle, DialogContent, DialogActions,
+  Radio, RadioGroup, FormControl, FormLabel, FormControlLabel,
+} from "@mui/material";
 import { 
   Logout as LogoutIcon,
   AccountCircle as AccountCircleIcon,
@@ -22,7 +21,7 @@ import {
   CloudDownload as CloudDownloadIcon,
   CloudUpload as CloudUploadIcon,
   Restore as RestoreIcon
-}  from '@mui/icons-material';
+}  from "@mui/icons-material";
 
 const PlatesURL = `${import.meta.env.VITE_SERVER_URL}/plates`;
 const CreatePlatesURL = `${PlatesURL}/create`;
@@ -75,7 +74,7 @@ const TopBar = (props) => {
   // ACTIONS ----------------------------------------------
 
   // swap the current plate; warn about discarding changes if applicable
-  const onDropdownChange = (event, value) => {
+  const onDropdownChange = (e, value) => {
     if (currPlate && value._id === currPlate._id) { return; }
     // TODO
     // if (isModified) {
@@ -84,13 +83,52 @@ const TopBar = (props) => {
     setCurrPlate(value);
   };
 
+  // CreatePlate Stuff ==================
+  const [createPlateDialogIsOpen, setCreatePlateDialogIsOpen] = useState(false);
+  const openCreatePlateDialog = () => { setCreatePlateDialogIsOpen(true); };
+  const closeCreatePlateDialog = () => { setCreatePlateDialogIsOpen(false); };
+
+  const [newPlateName, setNewPlateName] = useState("New Plate");
+  const handleNewPlateNameChange = (e) => { setNewPlateName(e.target.value); }
+  
+  const [sizeString, setSizeString] = useState("8,12");
+  const [nRowString, setnRowString] = useState("8");
+  const [nColString, setnColString] = useState("12");
+  const[customSizeInputSelected, setCustomSizeInputSelected] = useState(false);
+  const handleSizeSelection = (e) => {
+    if (e.target.value === "Custom") {
+      setCustomSizeInputSelected(true);
+    } else {
+      setCustomSizeInputSelected(false);
+    }
+    setSizeString(e.target.value);
+  };
+
+  const handlenRowInput = (e) => { setnRowString(e.target.value); }
+  const handlenColInput = (e) => { setnColString(e.target.value); }
+
   const handleCreatePlate = async () => {
+    let nRow, nCol;
+    if (sizeString === "Custom") {
+      nRow = parseInt(nRowString);
+      nCol = parseInt(nColString);
+    } else {
+      [ nRow, nCol ] = sizeString.split(",").map((num) => parseInt(num));
+    }
+    if (!nRow || nRow < 1 || nRow > 16) {
+      toast.error("Number of rows must be an integer between 1 and 16, inclusive.");
+      return
+    }
+    if (!nCol || nCol < 1 || nCol > 24) {
+      toast.error("Number of columns must be an integer between 1 and 24, inclusive.");
+      return
+    }
     const { data } = await axios.post(
       CreatePlatesURL,
       { plates: [{
-        plateName: "new plate",
-        nRow: 2,
-        nCol: 3
+        plateName: newPlateName,
+        nRow,
+        nCol,
       }] },
       { withCredentials: true }
     );
@@ -105,9 +143,11 @@ const TopBar = (props) => {
       setCurrPlate(result.newPlate);
       setPlatesCache([...platesCache, result.newPlate]);
     }
+    closeCreatePlateDialog();
   }
 
-  const handleDeleteCurrPlate = async () => {
+  // DeletePlate Stuff ==================
+  const handleDeletePlate = async () => {
     const { data } = await axios.post(
       DeletePlates,
       { IDs: [currPlate._id] },
@@ -130,13 +170,10 @@ const TopBar = (props) => {
     }
   }
 
-  const [anchorEl, setAnchorEl] = useState(null);
-  const handleProfileIconClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  }
-  const handleProfileMenuClose = () => {
-    setAnchorEl(null);
-  };
+  // Profile Menu Stuff ==================
+  const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState(null);
+  const openProfileMenu = (e) => { setProfileMenuAnchorEl(e.currentTarget); }
+  const closeProfileMenu = () => { setProfileMenuAnchorEl(null); };
 
   const handleLogout = () => {
     // TODO
@@ -171,36 +208,74 @@ const TopBar = (props) => {
             label="Choose a plate"
             inputProps={{
               ...params.inputProps,
-              autoComplete: 'off'
+              autoComplete: "off"
             }}
           />
         )}
       />
 
       <Tooltip title="Create new plate">
-        <IconButton onClick={handleCreatePlate} size="small">
+        <IconButton onClick={openCreatePlateDialog} size="small">
           <AddCircleOutlineIcon fontSize="large"/>
         </IconButton>
       </Tooltip>
 
+      <Dialog
+        open={createPlateDialogIsOpen}
+        onClose={closeCreatePlateDialog}
+      >
+        <DialogTitle>New Plate Info</DialogTitle>
+        <DialogContent>
+          <TextField
+            value={newPlateName}
+            onChange={handleNewPlateNameChange}
+            inputProps={{ maxLength: "20" }}
+            autoFocus
+            onFocus={e => {e.target.select();}}
+            required
+            autoComplete="off"
+            placeholder="Enter name for new plate"
+            label="Plate Name"
+          />
+          <FormControl>
+            <FormLabel>Size</FormLabel>
+            <RadioGroup value={sizeString} onChange={handleSizeSelection}>
+              <FormControlLabel value="8,12" control={<Radio />} label="8 x 12" />
+              <FormControlLabel value="16,24" control={<Radio />} label="16 x 24" />
+              <FormControlLabel value="Custom" control={<Radio />} label="Custom" />
+            </RadioGroup>
+            {customSizeInputSelected && (
+              <Box>
+                <TextField value={nRowString} onChange={handlenRowInput} inputProps={{maxLength: "2"}} label="Rows" variant="outlined" required/>
+                <TextField value={nColString} onChange={handlenColInput} inputProps={{maxLength: "2"}} label="Cols" variant="outlined" required/>
+              </Box>
+            )}
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeCreatePlateDialog}>Cancel</Button>
+          <Button onClick={handleCreatePlate}>Create</Button>
+        </DialogActions>
+      </Dialog>
+
       <Tooltip title="Delete current plate">
-        <IconButton onClick={handleDeleteCurrPlate} size="small">
+        <IconButton onClick={handleDeletePlate} size="small">
           <DeleteIcon fontSize="large"/>
         </IconButton>
       </Tooltip>
       
       <Tooltip title={`User: ${username}`}>
-        <IconButton onClick={handleProfileIconClick} size="small">
+        <IconButton onClick={openProfileMenu} size="small">
           <AccountCircleIcon fontSize="large" />
         </IconButton>
       </Tooltip>
 
       <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleProfileMenuClose}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        anchorEl={profileMenuAnchorEl}
+        open={Boolean(profileMenuAnchorEl)}
+        onClose={closeProfileMenu}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>
