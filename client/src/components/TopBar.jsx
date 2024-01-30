@@ -87,9 +87,9 @@ const TopBar = (props) => {
   };
 
   // CreatePlate ======================
-  const [createPlateDialogIsOpen, setCreatePlateDialogIsOpen] = useState(false);
-  const openCreatePlateDialog = () => { setCreatePlateDialogIsOpen(true); };
-  const closeCreatePlateDialog = () => { setCreatePlateDialogIsOpen(false); };
+  const [showCreatePlateDialog, setShowCreatePlateDialog] = useState(false);
+  const openCreatePlateDialog = () => { setShowCreatePlateDialog(true); };
+  const closeCreatePlateDialog = () => { setShowCreatePlateDialog(false); };
 
   const [newPlateName, setNewPlateName] = useState("New Plate");
   const handleNewPlateNameChange = (e) => { setNewPlateName(e.target.value); }
@@ -171,11 +171,18 @@ const TopBar = (props) => {
     setIsModified(false);
   }
 
-  const handleSyncPlate = async () => {
-    // TODO: warn about modification
+  const [syncTarget, setSyncTarget] = useState(null);
+  const onSyncPlate = () => {
+    if (isModified) {
+      setSyncTarget(selectedPlate);
+    } else {
+      handleSyncPlate(selectedPlate);
+    }
+  };
+  const handleSyncPlate = async (targetPlate) => {
     const { data } = await axios.post(
       ReadPlatesURL,
-      { IDs: [currPlate._id] },
+      { IDs: [targetPlate._id] },
       { withCredentials: true }
     );
     if (data.unauthorized) {
@@ -189,6 +196,7 @@ const TopBar = (props) => {
     }
     updateCachedPlate(result);
     setCurrPlate({...result});
+    setSyncTarget(null);
   }
 
   // SavePlate ========================
@@ -212,10 +220,15 @@ const TopBar = (props) => {
   }
 
   // RestorePlate =======================
-  const handleRestorePlate = async () => {
-    // TODO: warn about modification
+  const [restoreTarget, setRestoreTarget] = useState(null);
+  const onRestorePlate = () => {
+    setRestoreTarget(selectedPlate);
+  };
+  const handleRestorePlate = async (targetPlate) => {
     // NOTE: the button should be disabled if the plate is unmodified
-    setCurrPlate({...selectedPlate});
+    setCurrPlate({...targetPlate});
+    setIsModified(false);
+    setRestoreTarget(null);
   }
 
   // DeletePlate ======================
@@ -254,14 +267,20 @@ const TopBar = (props) => {
   const openProfileMenu = (e) => { setProfileMenuAnchorEl(e.currentTarget); }
   const closeProfileMenu = () => { setProfileMenuAnchorEl(null); };
 
-  const handleLogout = () => {
-    // TODO
-    // if (isModified) {
-    // https://mui.com/material-ui/react-dialog/
-    // }
+  // Logout ============================
+  const [logoutDialogDummy, setLogoutDialogDummy] = useState(null);
+  const onLogout = () => {
+    if (isModified) {
+      setLogoutDialogDummy({});
+    } else {
+      setLogoutDialogDummy(null);
+      handleLogout({});
+    }
+  };
+  const handleLogout = (dummy) => {
     removeCookie("token");  // will trigger the `cookies` dependence and cause redirection
     toast.success("Logged out successfully");
-  };
+  }
 
   return (
     <AppBar position="static" style={{ backgroundColor: "orange" }}>
@@ -307,7 +326,7 @@ const TopBar = (props) => {
         </IconButton>
       </Tooltip>
       <Dialog
-        open={createPlateDialogIsOpen}
+        open={showCreatePlateDialog}
         onClose={closeCreatePlateDialog}
         maxWidth="xs"
         fullWidth
@@ -374,10 +393,17 @@ const TopBar = (props) => {
       </Dialog>
 
       <Tooltip title="Sync current plate with the cloud's copy">
-        <span><IconButton onClick={handleSyncPlate} size="small">
+        <span><IconButton onClick={onSyncPlate} size="small">
           <CloudDownloadIcon fontSize="large"/>
         </IconButton></span>
       </Tooltip>
+      <ConfirmDialog
+        candidate={syncTarget}
+        setCandidate={setSyncTarget}
+        onConfirm={handleSyncPlate}
+        actionTitle="Unsaved changes in current plate"
+        actionDescription="Do you wish to discard the changes and sync current plate's info with the cloud's copy?"
+      />
 
       <Tooltip title="Save current plate and upload to cloud">
         <span><IconButton disabled={!isModified} onClick={handleSavePlate} size="small">
@@ -386,10 +412,17 @@ const TopBar = (props) => {
       </Tooltip>
 
       <Tooltip title="Restore current plate to last save">
-        <span><IconButton disabled={!isModified} onClick={handleRestorePlate} size="small">
+        <span><IconButton disabled={!isModified} onClick={onRestorePlate} size="small">
           <RestoreIcon fontSize="large"/>
         </IconButton></span>
       </Tooltip>
+      <ConfirmDialog 
+        candidate={restoreTarget}
+        setCandidate={setRestoreTarget}
+        onConfirm={handleRestorePlate}
+        actionTitle="Confirm Restoration"
+        actionDescription="Restore the current plate to its previous save? This cannot be undone."
+      />
 
       <Tooltip title="Delete current plate">
         <span><IconButton disabled={!Boolean(selectedPlate)} onClick={onDeletePlate} size="small">
@@ -419,12 +452,19 @@ const TopBar = (props) => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={handleLogout}>
+        <MenuItem onClick={onLogout}>
           <ListItemIcon>
             <LogoutIcon fontSize="small" />
           </ListItemIcon>
           Logout
         </MenuItem>
+        <ConfirmDialog 
+          candidate={logoutDialogDummy}
+          setCandidate={setLogoutDialogDummy}
+          onConfirm={handleLogout}
+          actionTitle="Unsaved changes in current plate"
+          actionDescription="Do you wish to discard the changes and log out?"
+      />
       </Menu>
     </Box>  
     </Toolbar>
