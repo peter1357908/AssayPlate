@@ -41,6 +41,7 @@ const TopBar = (props) => {
     cookies,
     removeCookie,
     setPlatePos,
+    setCurrWellIndex,
   } = props;
   
   const navigate = useNavigate();
@@ -90,6 +91,7 @@ const TopBar = (props) => {
     }
   };
   const handleDropdownChange = (value) => {
+    setCurrWellIndex(0);
     setSelectedPlate(value);
     setCurrPlate({...value});
     setIsModified(false);
@@ -159,6 +161,7 @@ const TopBar = (props) => {
     setIsModified(false);
     setSelectedPlate(result.newPlate);
     setCurrPlate({...result.newPlate});
+    setCurrWellIndex(0);
     setPlatesCache([...platesCache, result.newPlate]);
     closeCreatePlateDialog();
   };
@@ -171,7 +174,7 @@ const TopBar = (props) => {
   const updateCachedPlate = (updatedPlateCache) => {
     const newPlatesCache = platesCache.map((plate) => {
       if (plate._id != updatedPlateCache._id) {
-        return {...plate};
+        return plate;
       } else {
         return updatedPlateCache;
       }
@@ -213,7 +216,7 @@ const TopBar = (props) => {
   // SavePlate ========================
   const handleSavePlate = async () => {
     // NOTE: the button should be disabled if the plate is unmodified
-    // Also assumes that input validation is done at the AssayPlate level
+    // TODO: check for invalidate input
     const { data } = await axios.post(
       UpdatePlatesURL,
       { plates: [currPlate] },
@@ -264,6 +267,7 @@ const TopBar = (props) => {
     const newPlatesCache = platesCache.filter((plate) => plate._id != targetPlate._id);
     setPlatesCache(newPlatesCache);
     setIsModified(false);
+    setCurrWellIndex(0);
     setDeletionTarget(null);
     if (newPlatesCache.length > 0) {
       setSelectedPlate(newPlatesCache[0]);
@@ -421,13 +425,13 @@ const TopBar = (props) => {
       actionDescription="Do you wish to discard the changes and sync current plate's info with the cloud's copy?"
     />
 
-    <Tooltip title="Save current plate and upload to cloud">
+    <Tooltip title={isModified ? "Save current plate and upload to cloud" : "No changes to save"}>
       <span><IconButton disabled={!isModified} onClick={handleSavePlate} size="small">
         <SaveIcon fontSize="large"/>
       </IconButton></span>
     </Tooltip>
 
-    <Tooltip title="Restore current plate to last save">
+    <Tooltip title={isModified ? "Restore current plate to last save" : "No changes to revert"}>
       <span><IconButton disabled={!isModified} onClick={onRestorePlate} size="small">
         <RestorePageIcon fontSize="large"/>
       </IconButton></span>

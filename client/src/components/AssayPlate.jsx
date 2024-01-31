@@ -22,11 +22,30 @@ const AssayPlate = (props) => {
     setCurrPlate,
     setIsModified,
     platePos,
-    setPlatePos
+    setPlatePos,
+    currWellIndex,
+    setCurrWellIndex,
   } = props;
   
+  // ACTIONS ----------------------------------------------
 
-  // render the current plate
+  // Name Change ======================
+  const handleNameChange = (e) => {
+    setIsModified(true);
+    setCurrPlate({
+      ...currPlate,
+      plateName: e.target.value
+    });
+  }
+
+  // Reagent Change ===================
+
+
+  // Antibody Change ==================
+
+  // Concentration Change =============
+
+  // RENDERING --------------------------------------------
   const renderPlate = () => {
     if (!currPlate) {
       return (
@@ -47,7 +66,13 @@ const AssayPlate = (props) => {
       let rowContent = [<Box className="grid-cell-box" key="row-label">{rowLabelAlphabet.charAt(row)}</Box>];
       for (let col=0; col < nCol; col++) {
         rowContent.push(
-          <Well well={wells[i]} setCurrWell={null} key={col} />
+          <Well
+            well={wells[i]}
+            isCurrWell={i === currWellIndex}
+            i={i}
+            setCurrWellIndex={setCurrWellIndex}
+            key={i}
+          />
         );
         i++;
       }
@@ -64,18 +89,7 @@ const AssayPlate = (props) => {
       </Paper>
     );
   };
-  
-  // ACTIONS ----------------------------------------------
 
-  const handleNameChange = (e) => {
-    setIsModified(true);
-    setCurrPlate({
-      ...currPlate,
-      plateName: e.target.value
-    });
-  }
-
-  // STYLING ----------------------------------------------
   const bottomBarStyle = {
     padding: "0.2em 0",
     top: "auto",
@@ -104,6 +118,8 @@ const AssayPlate = (props) => {
           size="small"
           autoComplete="off"
           label="Plate Name"
+          error={currPlate && currPlate.plateName < 1}
+          required
         />
       </Toolbar>
     </AppBar>

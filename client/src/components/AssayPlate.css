@@ -26,7 +26,13 @@
   height: 1.7em;
 }
 
+.curr-well-highlight {
+  font-size: 2.1em !important;
+  color: gold;
+}
+
 .well-icon {
+  position: absolute;
   font-size: 1.7em !important;
   color: purple;
 }

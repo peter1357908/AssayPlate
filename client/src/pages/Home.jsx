@@ -7,6 +7,7 @@ const Home = (cookieStuff) => {
   const [currPlate, setCurrPlate] = useState(null);
   const [isModified, setIsModified] = useState(false);
   const [platePos, setPlatePos] = useState({ x: 0, y: 0 });
+  const [currWellIndex, setCurrWellIndex] = useState(0);
 
   return (
     <Box style={{
@@ -25,13 +26,17 @@ const Home = (cookieStuff) => {
         isModified={isModified}
         setIsModified={setIsModified}
         setPlatePos={setPlatePos}
+        setCurrWellIndex={setCurrWellIndex}
       />
       <AssayPlate
         currPlate={currPlate}
         setCurrPlate={setCurrPlate}
         setIsModified={setIsModified}
         platePos={platePos}
-        setPlatePos={setPlatePos} />
+        setPlatePos={setPlatePos}
+        currWellIndex={currWellIndex}
+        setCurrWellIndex={setCurrWellIndex}
+      />
     </Box>
   );
 };
