@@ -2,7 +2,15 @@ import { useEffect, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Paper, Avatar, TextField, Button, Typography, Link } from "@mui/material";
+import {
+  Paper,
+  Avatar,
+  TextField,
+  Button,
+  Typography,
+  Link,
+  Divider,
+} from "@mui/material";
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 const Signup = ({ cookies }) => {
@@ -44,7 +52,7 @@ const Signup = ({ cookies }) => {
     }
   };
 
-  const paperStyle = { padding: 20, width: 300, display: "flex", flexDirection: "column", alignItems: "center" };
+  const paperStyle = { padding: 20, width: 300, display: "flex", flexDirection: "column", alignItems: "center", gap: 5 };
   const avatarStyle = { backgroundColor: "#1bbd7e", width: 50, height: 50 };
   const buttonstyle = { margin: '20px 0' };
 
@@ -54,7 +62,9 @@ const Signup = ({ cookies }) => {
       <TextField value={username} onChange={handleUsernameChange} inputProps={{maxLength: "20"}} label="Username" placeholder="Enter username" variant="outlined" autoComplete="username" margin="normal" fullWidth required/>
       <TextField value={password} onChange={handlePasswordChange} inputProps={{maxLength: "20"}} label="Password" placeholder="Enter password" type="password" variant="outlined" autoComplete="new-password" margin="dense" fullWidth required/>
       <Button type="submit" color="primary" variant="contained" onClick={handleSubmit} style={buttonstyle} fullWidth>Sign up</Button>
-      <Typography>Already have an account? <Link component={RouterLink} to="/login">Log in</Link></Typography>
+      <Typography>Already have an account? <Link underline="hover" component={RouterLink} to="/login">Log in</Link></Typography>
+      <Divider variant="middle" flexItem />
+      <Typography variant="caption">Fully stacked by <Link underline="hover" href="https://peterish.com/" target="_blank">Peter Gao</Link></Typography>
     </Paper>
   );
 };
