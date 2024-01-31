@@ -18,8 +18,10 @@ const rowLabelAlphabet = "ABCDEFGHIJKLMNOP";  // QRSTUVWXYZ
 
 const AssayPlate = (props) => {
   const {
-    currPlate,
-    setCurrPlate,
+    currPlateName,
+    setCurrPlateName,
+    currWellsInfo,
+    setCurrWellsInfo,
     setIsModified,
     platePos,
     setPlatePos,
@@ -32,14 +34,18 @@ const AssayPlate = (props) => {
   // Name Change ======================
   const handleNameChange = (e) => {
     setIsModified(true);
-    setCurrPlate({
-      ...currPlate,
-      plateName: e.target.value
-    });
+    setCurrPlateName(e.target.value);
   }
 
   // Reagent Change ===================
-
+  // const handleReagentChange = (e) => {
+  //   setIsModified(true);
+  //   const newCurrPlate = {...currPlate};
+  //   setCurrPlate({
+  //     ...currPlate,
+  //     plateName: e.target.value
+  //   });
+  // }
 
   // Antibody Change ==================
 
@@ -47,12 +53,12 @@ const AssayPlate = (props) => {
 
   // RENDERING --------------------------------------------
   const renderPlate = () => {
-    if (!currPlate) {
+    if (!currWellsInfo) {
       return (
         <Typography>Create a plate to get started!</Typography>
       )
     }
-    const { nRow, nCol, wells } = currPlate;
+    const { nRow, nCol, wells } = currWellsInfo;
     const columnLabels = [<Box className="grid-cell-box" key="0" />];  // (0,0) is empty
     for (let col=1; col <= nCol; col++) {
       columnLabels.push(
@@ -110,15 +116,15 @@ const AssayPlate = (props) => {
       <Toolbar>
         <TextField
           style={{ width: "20ch" }}
-          disabled={!Boolean(currPlate)}
-          value={currPlate ? currPlate.plateName : "(no plate selected)"}
+          disabled={!Boolean(currWellsInfo)}
+          value={currPlateName ? currPlateName : "(no plate selected)"}
           onChange={handleNameChange}
           inputProps={{ maxLength: "20" }}
           variant="outlined"
           size="small"
           autoComplete="off"
           label="Plate Name"
-          error={currPlate && currPlate.plateName < 1}
+          error={currPlateName.length < 1}
           required
         />
       </Toolbar>

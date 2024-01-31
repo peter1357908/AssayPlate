@@ -4,7 +4,8 @@ import AssayPlate from "../components/AssayPlate";
 import Box from "@mui/material/Box";
 
 const Home = (cookieStuff) => {
-  const [currPlate, setCurrPlate] = useState(null);
+  const [currPlateName, setCurrPlateName] = useState("");
+  const [currWellsInfo, setCurrWellsInfo] = useState(null);
   const [isModified, setIsModified] = useState(false);
   const [platePos, setPlatePos] = useState({ x: 0, y: 0 });
   const [currWellIndex, setCurrWellIndex] = useState(0);
@@ -21,16 +22,20 @@ const Home = (cookieStuff) => {
       }}>
       <TopBar
         {...cookieStuff}
-        currPlate={currPlate}
-        setCurrPlate={setCurrPlate}
+        currPlateName={currPlateName}
+        setCurrPlateName={setCurrPlateName}
+        currWellsInfo={currWellsInfo}
+        setCurrWellsInfo={setCurrWellsInfo}
         isModified={isModified}
         setIsModified={setIsModified}
         setPlatePos={setPlatePos}
         setCurrWellIndex={setCurrWellIndex}
       />
       <AssayPlate
-        currPlate={currPlate}
-        setCurrPlate={setCurrPlate}
+        currPlateName={currPlateName}
+        setCurrPlateName={setCurrPlateName}
+        currWellsInfo={currWellsInfo}
+        setCurrWellsInfo={setCurrWellsInfo}
         setIsModified={setIsModified}
         platePos={platePos}
         setPlatePos={setPlatePos}

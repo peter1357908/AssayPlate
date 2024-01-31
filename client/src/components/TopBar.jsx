@@ -34,8 +34,10 @@ const DeletePlatesURL = `${PlatesURL}/delete`;
 
 const TopBar = (props) => {
   const {
-    currPlate,
-    setCurrPlate,
+    currPlateName,
+    setCurrPlateName,
+    currWellsInfo,
+    setCurrWellsInfo,
     isModified,
     setIsModified,
     cookies,
@@ -68,10 +70,17 @@ const TopBar = (props) => {
       }
       setUsername(data.username);
       if (data.plates.length > 0) {
+        setCurrWellIndex(0);
         setIsModified(false);
         setPlatesCache(data.plates);
-        setSelectedPlate(data.plates[0]);
-        setCurrPlate({...data.plates[0]});
+        const newSelectedPlate = data.plates[0];
+        setSelectedPlate(newSelectedPlate);
+        setCurrPlateName(newSelectedPlate.plateName);
+        setCurrWellsInfo({
+          nRow: newSelectedPlate.nRow,
+          nCol: newSelectedPlate.nCol,
+          wells: [...newSelectedPlate.wells],
+        });
       }
     };
     verifyCookie();
@@ -93,7 +102,12 @@ const TopBar = (props) => {
   const handleDropdownChange = (value) => {
     setCurrWellIndex(0);
     setSelectedPlate(value);
-    setCurrPlate({...value});
+    setCurrPlateName(value.plateName);
+    setCurrWellsInfo({
+      nRow: value.nRow,
+      nCol: value.nCol,
+      wells: [...value.wells],
+    });
     setIsModified(false);
     setDropdownChangeCandidate(null);
   };
@@ -160,7 +174,12 @@ const TopBar = (props) => {
 
     setIsModified(false);
     setSelectedPlate(result.newPlate);
-    setCurrPlate({...result.newPlate});
+    setCurrPlateName(result.newPlate.plateName);
+    setCurrWellsInfo({
+      nRow: result.newPlate.nRow,
+      nCol: result.newPlate.nCol,
+      wells: [...result.newPlate.wells],
+    });
     setCurrWellIndex(0);
     setPlatesCache([...platesCache, result.newPlate]);
     closeCreatePlateDialog();
@@ -209,7 +228,12 @@ const TopBar = (props) => {
       return toast.error(result.reason);
     }
     updateCachedPlate(result);
-    setCurrPlate({...result});
+    setCurrPlateName(result.plateName);
+    setCurrWellsInfo({
+      nRow: result.nRow,
+      nCol: result.nCol,
+      wells: [...result.wells],
+    });
     setSyncTarget(null);
   };
 
@@ -217,12 +241,20 @@ const TopBar = (props) => {
   const handleSavePlate = async () => {
     // NOTE: the button should be disabled if the plate is unmodified
     // TODO: check for invalidate input
+
+    const updatedPlate = {
+      _id: selectedPlate._id,
+      plateName: currPlateName,
+      nRow: currWellsInfo.nRow,
+      nCol: currWellsInfo.nCol,
+      wells: [...currWellsInfo.wells],
+    };
+
     const { data } = await axios.post(
       UpdatePlatesURL,
-      { plates: [currPlate] },
+      { plates: [updatedPlate]},
       { withCredentials: true }
     );
-    console.log(data);
     if (data.unauthorized) {
       removeCookie("token");
       return navigate("/login");
@@ -231,7 +263,7 @@ const TopBar = (props) => {
       // should not happen during normal use
       return toast.error(data.failures[0].reason);
     }
-    updateCachedPlate({...currPlate});
+    updateCachedPlate(updatedPlate);
   };
 
   // RestorePlate =======================
@@ -241,7 +273,12 @@ const TopBar = (props) => {
   };
   const handleRestorePlate = async (targetPlate) => {
     // NOTE: the button should be disabled if the plate is unmodified
-    setCurrPlate({...targetPlate});
+    setCurrPlateName(targetPlate.plateName);
+    setCurrWellsInfo({
+      nRow: targetPlate.nRow,
+      nCol: targetPlate.nCol,
+      wells: [...targetPlate.wells],
+    });
     setIsModified(false);
     setRestoreTarget(null);
   };
@@ -271,10 +308,16 @@ const TopBar = (props) => {
     setDeletionTarget(null);
     if (newPlatesCache.length > 0) {
       setSelectedPlate(newPlatesCache[0]);
-      setCurrPlate({...newPlatesCache[0]});
+      setCurrPlateName(newPlatesCache[0].plateName);
+      setCurrWellsInfo({
+        nRow: newPlatesCache[0].nRow,
+        nCol: newPlatesCache[0].nCol,
+        wells: [...newPlatesCache[0].wells],
+      });
     } else {
       setSelectedPlate(null);
-      setCurrPlate(null);
+      setCurrPlateName("");
+      setCurrWellsInfo(null);
     }
   };
 
