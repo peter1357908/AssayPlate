@@ -24,7 +24,7 @@ module.exports.CreatePlates = async (req, res) => {
     if (typeof plateName != "string" || plateName.length < 1 || plateName.length > 20) {
       output.push({
         isCreated: false,
-        reason: "Plate name must be a string between 1 to 20 characters."
+        reason: "Plate name must be a string between 1 to 20 characters, inclusive."
       });
       continue;
     }
@@ -178,7 +178,7 @@ module.exports.UpdatePlates = async (req, res) => {
   const failures = [];
 
   if (!isIterable(req.body.plates)) {
-    return res.json({message:"Missing or invalid object `plates`"});
+    return res.json({ message: "Missing or invalid object `plates`" });
   }
 
   for (let requestedPlate of req.body.plates) {
@@ -214,20 +214,17 @@ module.exports.UpdatePlates = async (req, res) => {
       try { await req.user.save(); } catch (err) { console.log(err); }
       continue;
     }
-
     // update plateName if valid
-    if (plateName) {
-      if (typeof plateName != "string" || plateName.length > 20) {
-        failures.push({
-          _id,
-          reason: "Plate name must be a string of no more than 20 characters."
-        });
-        continue;
-      }
-      plate.plateName = plateName;
+    if (typeof plateName != "string" || plateName.length < 1 || plateName.length > 20) {
+      failures.push({
+        _id,
+        reason: "Plate name must be a string between 1 to 20 characters, inclusive."
+      });
+      continue;
     }
+    plate.plateName = plateName;
 
-    // update the wells if valid
+    // update the wells if valid AND provided
     if (wells) {
       if (!Array.isArray(wells) || plate.nCol * plate.nRow != wells.length) {
         failures.push({

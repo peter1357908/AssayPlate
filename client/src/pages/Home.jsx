@@ -3,13 +3,10 @@ import TopBar from "../components/TopBar";
 import AssayPlate from "../components/AssayPlate";
 import Box from "@mui/material/Box";
 
-const Home = (props) => {
+const Home = (cookieStuff) => {
   const [currPlate, setCurrPlate] = useState(null);
   const [isModified, setIsModified] = useState(false);
-
-  const sharedProps = {
-    currPlate, setCurrPlate, isModified, setIsModified
-  };
+  const [platePos, setPlatePos] = useState({ x: 0, y: 0 });
 
   return (
     <Box style={{
@@ -18,10 +15,23 @@ const Home = (props) => {
       width: "100vw",
       flexDirection: "column",
       alignItems: "center",
-      justifyContent: "space-between"
+      justifyContent: "center",
+      overflow: "hidden",
       }}>
-      <TopBar {...sharedProps} {...props} />
-      <AssayPlate {...sharedProps} />
+      <TopBar
+        {...cookieStuff}
+        currPlate={currPlate}
+        setCurrPlate={setCurrPlate}
+        isModified={isModified}
+        setIsModified={setIsModified}
+        setPlatePos={setPlatePos}
+      />
+      <AssayPlate
+        currPlate={currPlate}
+        setCurrPlate={setCurrPlate}
+        setIsModified={setIsModified}
+        platePos={platePos}
+        setPlatePos={setPlatePos} />
     </Box>
   );
 };

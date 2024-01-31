@@ -10,7 +10,7 @@ const { MONGO_URL, PORT, FRONTEND_URL } = process.env;
 
 mongoose
   .connect(MONGO_URL)
-  .then(() => console.log("MongoDB is  connected successfully"))
+  .then(() => console.log("MongoDB is connected successfully"))
   .catch((err) => console.error(err));
 
 app.listen(PORT, () => {

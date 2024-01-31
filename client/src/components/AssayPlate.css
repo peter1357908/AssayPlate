@@ -1,0 +1,38 @@
+#assay-plate {
+  cursor: move;
+  padding: 1em;
+  background-color: mintcream;
+  display: flex;
+  flex-direction: column;
+}
+
+.assay-plate-row {
+  display: flex;
+}
+
+.grid-cell-box {
+  min-width: 2.5em;
+  width: 2.5em;
+  height: 2.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: black;
+  font-weight: bold;
+}
+
+.well-button {
+  width: 1.7em;
+  height: 1.7em;
+}
+
+.well-icon {
+  font-size: 1.7em !important;
+  color: purple;
+}
+
+.antibody-icon {
+  font-size: 1.0em !important;
+  position: absolute;
+  color: darksalmon;
+}
