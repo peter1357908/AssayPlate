@@ -55,11 +55,11 @@ module.exports.CreatePlates = async (req, res) => {
       let failureReason = null;
       for (let well of wells) {
         let { reagent, antibody, concentration } = well;
-        if (typeof reagent != "string" || (reagent.length > 0 && !reagent.match(/^R\d+$/))) {
-          failureReason = `reagent "${reagent}" is invalid! It must be either an emtpy string or one that starts with "R" and followed by numbers.`;
+        if (typeof reagent != "string" || reagent.length > 200 || (reagent.length > 0 && !reagent.match(/^R\d+$/))) {
+          failureReason = `reagent "${reagent}" is invalid! It must be either an emtpy string or one that starts with "R" and followed by numbers, within 200 characters.`;
           break;
         }
-        if (typeof antibody != "string") {
+        if (typeof antibody != "string" || antibody.length > 200) {
           failureReason = `antibody "${antibody}" is invalid! It must be a string.`;
           break;
         }
@@ -239,12 +239,12 @@ module.exports.UpdatePlates = async (req, res) => {
       let failureReason = null;
       for (let well of wells) {
         let { reagent, antibody, concentration } = well;
-        if (typeof reagent != "string" || (reagent.length > 0 && !reagent.match(/^R\d+$/))) {
-          failureReason = `reagent "${reagent}" is invalid! It must be either an emtpy string or one that starts with "R" and followed by numbers.`;
+        if (typeof reagent != "string" || reagent.length > 200 || (reagent.length > 0 && !reagent.match(/^R\d+$/))) {
+          failureReason = `reagent "${reagent}" is invalid! It must be either an emtpy string or one that starts with "R" and followed by numbers, within 200 characters.`;
           break;
         }
-        if (typeof antibody != "string") {
-          failureReason = `antibody "${antibody}" is invalid! It must be a string.`;
+        if (typeof antibody != "string" || antibody.length > 200) {
+          failureReason = `antibody "${antibody}" is invalid! It must be a string within 200 characters.`;
           break;
         }
         if (typeof concentration != "number" || concentration < 0) {

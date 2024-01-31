@@ -5,11 +5,6 @@ import {
   TextField,
   AppBar, Toolbar,
 } from "@mui/material";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import {
-  CenterFocusStrong as CenterFocusStrongIcon,
-} from "@mui/icons-material";
 import Draggable from 'react-draggable'; 
 import Well from "./Well";
 import "./AssayPlate.css"
@@ -38,18 +33,54 @@ const AssayPlate = (props) => {
   }
 
   // Reagent Change ===================
-  // const handleReagentChange = (e) => {
-  //   setIsModified(true);
-  //   const newCurrPlate = {...currPlate};
-  //   setCurrPlate({
-  //     ...currPlate,
-  //     plateName: e.target.value
-  //   });
-  // }
+  const handleReagentChange = (e) => {
+    setIsModified(true);
+    const newWellsInfo = {...currWellsInfo};
+    const reagent = e.target.value;
+    const newWell = newWellsInfo.wells[currWellIndex];
+    if (reagent.length > 0 && !reagent.match(/^R\d+$/)) {
+      newWell.reagentIsInvalid = true;
+    } else {
+      newWell.reagentIsInvalid = false;
+    }
+    newWell.reagent = reagent;
+    setCurrWellsInfo(newWellsInfo);
+  }
 
   // Antibody Change ==================
+  const handleAntibodyChange = (e) => {
+    setIsModified(true);
+    const newWellsInfo = {...currWellsInfo};
+    const antibody = e.target.value;
+    const newWell = newWellsInfo.wells[currWellIndex];
+    if (!antibody && newWell.concentration != 0) {
+      newWell.concentrationIsInvalid = true;
+    } else {
+      newWell.concentrationIsInvalid = false;
+    }
+    newWell.antibody = antibody;
+    setCurrWellsInfo(newWellsInfo);
+  }
 
   // Concentration Change =============
+  // NOTE: concentration is stored as a string when modified, to allow
+  // temporary invalid values. Before saving to cloud, the strings are
+  // all converted to floats (if they are all valid).
+  const handleConcentrationChange = (e) => {
+    setIsModified(true);
+    const newConcentrationString = e.target.value;
+
+    const newWellsInfo = {...currWellsInfo};
+    const newWell = newWellsInfo.wells[currWellIndex];
+    if (newConcentrationString && 
+      (!newConcentrationString.match(/^\d*\.?\d+$/) || !newWell.antibody)) {
+      newWell.concentrationIsInvalid = true;
+    } else {
+      newWell.concentrationIsInvalid = false;
+    }
+    newWell.concentration = newConcentrationString;
+    setCurrWellsInfo(newWellsInfo);
+  }
 
   // RENDERING --------------------------------------------
   const renderPlate = () => {
@@ -115,8 +146,8 @@ const AssayPlate = (props) => {
     <AppBar position="fixed" style={bottomBarStyle}>
       <Toolbar>
         <TextField
-          style={{ width: "20ch" }}
-          disabled={!Boolean(currWellsInfo)}
+          style={{ width: "21ch" }}
+          disabled={!Boolean(currPlateName)}
           value={currPlateName ? currPlateName : "(no plate selected)"}
           onChange={handleNameChange}
           inputProps={{ maxLength: "20" }}
@@ -124,8 +155,46 @@ const AssayPlate = (props) => {
           size="small"
           autoComplete="off"
           label="Plate Name"
-          error={currPlateName.length < 1}
+          error={currWellsInfo && currPlateName.length < 1}
           required
+        />
+
+        <Box style={{ flexGrow: 1 }} />
+
+        <TextField
+          style={{ width: "21ch" }}
+          disabled={!Boolean(currWellsInfo)}
+          value={currWellsInfo ? currWellsInfo.wells[currWellIndex].reagent : "(no well selected)"}
+          onChange={handleReagentChange}
+          inputProps={{ maxLength: "200" }}
+          variant="outlined"
+          size="small"
+          autoComplete="off"
+          label="Reagent"
+          error={currWellsInfo && currWellsInfo.wells[currWellIndex].reagentIsInvalid}
+        />
+        <TextField
+          style={{ width: "21ch" }}
+          disabled={!Boolean(currWellsInfo)}
+          value={currWellsInfo ? currWellsInfo.wells[currWellIndex].antibody : "(no well selected)"}
+          onChange={handleAntibodyChange}
+          inputProps={{ maxLength: "200" }}
+          variant="outlined"
+          size="small"
+          autoComplete="off"
+          label="Antibody"
+        />
+        <TextField
+          style={{ width: "21ch" }}
+          disabled={!Boolean(currWellsInfo)}
+          value={currWellsInfo ? currWellsInfo.wells[currWellIndex].concentration : "(no well selected)"}
+          onChange={handleConcentrationChange}
+          inputProps={{ maxLength: "20" }}
+          variant="outlined"
+          size="small"
+          autoComplete="off"
+          label="Concentration"
+          error={currWellsInfo && currWellsInfo.wells[currWellIndex].concentrationIsInvalid}
         />
       </Toolbar>
     </AppBar>

@@ -6,6 +6,7 @@ import Box from "@mui/material/Box";
 const Home = (cookieStuff) => {
   const [currPlateName, setCurrPlateName] = useState("");
   const [currWellsInfo, setCurrWellsInfo] = useState(null);
+  const [selectedPlate, setSelectedPlate] = useState(null);
   const [isModified, setIsModified] = useState(false);
   const [platePos, setPlatePos] = useState({ x: 0, y: 0 });
   const [currWellIndex, setCurrWellIndex] = useState(0);
@@ -26,6 +27,8 @@ const Home = (cookieStuff) => {
         setCurrPlateName={setCurrPlateName}
         currWellsInfo={currWellsInfo}
         setCurrWellsInfo={setCurrWellsInfo}
+        selectedPlate={selectedPlate}
+        setSelectedPlate={setSelectedPlate}
         isModified={isModified}
         setIsModified={setIsModified}
         setPlatePos={setPlatePos}
@@ -36,6 +39,8 @@ const Home = (cookieStuff) => {
         setCurrPlateName={setCurrPlateName}
         currWellsInfo={currWellsInfo}
         setCurrWellsInfo={setCurrWellsInfo}
+        selectedPlate={selectedPlate}
+        isModified={isModified}
         setIsModified={setIsModified}
         platePos={platePos}
         setPlatePos={setPlatePos}

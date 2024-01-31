@@ -38,6 +38,8 @@ const TopBar = (props) => {
     setCurrPlateName,
     currWellsInfo,
     setCurrWellsInfo,
+    selectedPlate,
+    setSelectedPlate,
     isModified,
     setIsModified,
     cookies,
@@ -54,7 +56,7 @@ const TopBar = (props) => {
 
   // on first render or any cookie change, fetch all plates and set current plate
   // to be the first plate if possible. Redirect to login as necessary.
-  const [selectedPlate, setSelectedPlate] = useState(null);
+  
   useEffect(() => {
     const verifyCookie = async () => {
       if (!cookies.token || cookies.token === "undefined") {
@@ -79,7 +81,7 @@ const TopBar = (props) => {
         setCurrWellsInfo({
           nRow: newSelectedPlate.nRow,
           nCol: newSelectedPlate.nCol,
-          wells: [...newSelectedPlate.wells],
+          wells: structuredClone(newSelectedPlate.wells),
         });
       }
     };
@@ -106,7 +108,7 @@ const TopBar = (props) => {
     setCurrWellsInfo({
       nRow: value.nRow,
       nCol: value.nCol,
-      wells: [...value.wells],
+      wells: structuredClone(value.wells),
     });
     setIsModified(false);
     setDropdownChangeCandidate(null);
@@ -178,7 +180,7 @@ const TopBar = (props) => {
     setCurrWellsInfo({
       nRow: result.newPlate.nRow,
       nCol: result.newPlate.nCol,
-      wells: [...result.newPlate.wells],
+      wells: structuredClone(result.newPlate.wells),
     });
     setCurrWellIndex(0);
     setPlatesCache([...platesCache, result.newPlate]);
@@ -232,7 +234,7 @@ const TopBar = (props) => {
     setCurrWellsInfo({
       nRow: result.nRow,
       nCol: result.nCol,
-      wells: [...result.wells],
+      wells: structuredClone(result.wells),
     });
     setSyncTarget(null);
   };
@@ -240,14 +242,19 @@ const TopBar = (props) => {
   // SavePlate ========================
   const handleSavePlate = async () => {
     // NOTE: the button should be disabled if the plate is unmodified
-    // TODO: check for invalidate input
+    if (currPlateName < 1) {
+      return toast.error("Plate Name is required!");
+    }
+    for (let well of currWellsInfo.wells) {
+      if (well.concentrationIsInvalid || well.reagentIsInvalid) {
+        return toast.error("Plate contains invalid cells!");
+      }
+    }
 
     const updatedPlate = {
       _id: selectedPlate._id,
       plateName: currPlateName,
-      nRow: currWellsInfo.nRow,
-      nCol: currWellsInfo.nCol,
-      wells: [...currWellsInfo.wells],
+      wells: structuredClone(currWellsInfo.wells),
     };
 
     const { data } = await axios.post(
@@ -263,6 +270,8 @@ const TopBar = (props) => {
       // should not happen during normal use
       return toast.error(data.failures[0].reason);
     }
+    updatedPlate.nRow = currWellsInfo.nRow;
+    updatedPlate.nCol = currWellsInfo.nCol;
     updateCachedPlate(updatedPlate);
   };
 
@@ -277,7 +286,7 @@ const TopBar = (props) => {
     setCurrWellsInfo({
       nRow: targetPlate.nRow,
       nCol: targetPlate.nCol,
-      wells: [...targetPlate.wells],
+      wells: structuredClone(targetPlate.wells),
     });
     setIsModified(false);
     setRestoreTarget(null);
@@ -312,7 +321,7 @@ const TopBar = (props) => {
       setCurrWellsInfo({
         nRow: newPlatesCache[0].nRow,
         nCol: newPlatesCache[0].nCol,
-        wells: [...newPlatesCache[0].wells],
+        wells: structuredClone(newPlatesCache[0].wells),
       });
     } else {
       setSelectedPlate(null);
@@ -341,6 +350,7 @@ const TopBar = (props) => {
     toast.success("Logged out successfully");
   };
 
+  // RENDERING --------------------------------------------
   const topBarStyle = {
     padding: "0.2em 0",
     backgroundColor: "orange",
