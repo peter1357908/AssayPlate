@@ -4,6 +4,7 @@ import {
   Typography,
   TextField,
   AppBar, Toolbar,
+  Tooltip
 } from "@mui/material";
 import Draggable from 'react-draggable'; 
 import Well from "./Well";
@@ -161,6 +162,7 @@ const AssayPlate = (props) => {
 
         <Box style={{ flexGrow: 1 }} />
 
+        <Tooltip arrow title={"format: \"R\" followed by numbers"}>
         <TextField
           style={{ width: "21ch" }}
           disabled={!Boolean(currWellsInfo)}
@@ -173,6 +175,9 @@ const AssayPlate = (props) => {
           label="Reagent"
           error={currWellsInfo && currWellsInfo.wells[currWellIndex].reagentIsInvalid}
         />
+        </Tooltip>
+
+        <Tooltip arrow title="format: any string">
         <TextField
           style={{ width: "21ch" }}
           disabled={!Boolean(currWellsInfo)}
@@ -184,6 +189,9 @@ const AssayPlate = (props) => {
           autoComplete="off"
           label="Antibody"
         />
+        </Tooltip>
+
+        <Tooltip arrow title="format: any nonnegative number">
         <TextField
           style={{ width: "21ch" }}
           disabled={!Boolean(currWellsInfo)}
@@ -196,6 +204,7 @@ const AssayPlate = (props) => {
           label="Concentration"
           error={currWellsInfo && currWellsInfo.wells[currWellIndex].concentrationIsInvalid}
         />
+        </Tooltip>
       </Toolbar>
     </AppBar>
     </>

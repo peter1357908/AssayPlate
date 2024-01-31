@@ -251,10 +251,18 @@ const TopBar = (props) => {
       }
     }
 
+    const newWells = structuredClone(currWellsInfo.wells);
+    // parse all concentration strings into numbers
+    for (let well of newWells) {
+      if (typeof well.concentration != "number") {
+        well.concentration = parseFloat(well.concentration);
+      }
+    }
+
     const updatedPlate = {
       _id: selectedPlate._id,
       plateName: currPlateName,
-      wells: structuredClone(currWellsInfo.wells),
+      wells: newWells,
     };
 
     const { data } = await axios.post(
