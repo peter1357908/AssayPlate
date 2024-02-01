@@ -1,2 +1,7 @@
 # AssayPlate
-Take-home challenge for Sphinx Bio's SWE position. Allows scientists to plan experiments on assay plates. Front-end-heavy.
+Plan experiments with this Assay Plate web app. You can save multiple assay plate layouts to the cloud under your profile.
+
+## Notable Features:
+
+
+## API
