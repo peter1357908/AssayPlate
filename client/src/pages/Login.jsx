@@ -16,12 +16,19 @@ import LockPersonIcon from "@mui/icons-material/LockPerson";
 const Login = ({ cookies }) => {
   const navigate = useNavigate();
   
+  console.log("before useEffect Login");
+  console.log(cookies);
   // if a token already exists, just navigate to the home page.
   useEffect(() => {
+    console.log("in useEffect Login");
+    console.log(cookies);
     if (cookies.token && cookies.token != "undefined") {
       navigate("/");
     }
   }, []);
+
+  console.log("after useEffect Login");
+  console.log(cookies);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");

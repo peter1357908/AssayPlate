@@ -56,8 +56,11 @@ const TopBar = (props) => {
 
   // on first render or any cookie change, fetch all plates and set current plate
   // to be the first plate if possible. Redirect to login as necessary.
-  
+  console.log("before useEffect TopBar");
+  console.log(cookies);
   useEffect(() => {
+    console.log("in useEffect TopBar, before verifyCookie");
+    console.log(cookies);
     const verifyCookie = async () => {
       if (!cookies.token || cookies.token === "undefined") {
         return navigate("/login");
@@ -86,7 +89,11 @@ const TopBar = (props) => {
       }
     };
     verifyCookie();
+    console.log("in useEffect TopBar, after verifyCookie");
+    console.log(cookies);
   }, [cookies]);
+  console.log("after useEffect TopBar");
+    console.log(cookies);
 
   // ACTIONS ----------------------------------------------
 
