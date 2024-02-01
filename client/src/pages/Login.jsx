@@ -13,28 +13,14 @@ import {
 } from "@mui/material";
 import LockPersonIcon from "@mui/icons-material/LockPerson";
 
-const Login = ({ cookies, setCookie }) => {
+const Login = () => {
   const navigate = useNavigate();
-  
-  console.log("before useEffect Login");
-  console.log(cookies);
-  console.log(document.cookie);
   // if a token already exists, just navigate to the home page.
   useEffect(() => {
-    console.log("in useEffect Login");
-    console.log(cookies);
-    console.log(document.cookie);
-    if (cookies.token) {
-      console.log("in Login useEffect before navigation!!");
-      console.log(cookies);
-      console.log(document.cookie);
+    if (document.cookie) {
       navigate("/");
     }
   }, []);
-
-  console.log("after useEffect Login");
-  console.log(cookies)
-  console.log(document.cookie);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -48,29 +34,20 @@ const Login = ({ cookies, setCookie }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data, headers } = await axios.post(
+      const { data } = await axios.post(
         `${import.meta.env.VITE_SERVER_URL}/login`,
         { username, password },
         { withCredentials: true }
       );
-      console.log(headers['set-cookie']);
       const { success, message } = data;
       if (success) {
-        console.log("in Login success!!");
-        console.log(document.cookie);
-        console.log(cookies);
         toast.success(message);
-        setTimeout(() => {
-          console.log("in Login success after timeout before navigation!")
-          console.log(document.cookie);
-          console.log(cookies);
-          navigate("/");
-        }, 1000);
+        navigate("/");
       } else {
         toast.error(message);
       }
     } catch (error) {
-      console.log(error);
+      toast.error(error);
     }
   };
 

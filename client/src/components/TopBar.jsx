@@ -26,6 +26,7 @@ import {
 } from "@mui/icons-material";
 import ConfirmDialog from "./ConfirmDialog";
 
+const LogoutURL = `${import.meta.env.VITE_SERVER_URL}/logout`;
 const PlatesURL = `${import.meta.env.VITE_SERVER_URL}/plates`;
 const CreatePlatesURL = `${PlatesURL}/create`;
 const ReadPlatesURL = `${PlatesURL}/read`;
@@ -42,8 +43,6 @@ const TopBar = (props) => {
     setSelectedPlate,
     isModified,
     setIsModified,
-    cookies,
-    removeCookie,
     setPlatePos,
     setCurrWellIndex,
   } = props;
@@ -53,20 +52,24 @@ const TopBar = (props) => {
   const [platesCache, setPlatesCache] = useState([]);
 
   // EFFECTS ----------------------------------------------
+  const handleLogout = async (dummy=null) => {
+    toast.info("Logging out...");
+    await axios.post(
+      LogoutURL,
+      {},
+      { withCredentials: true }
+    );
+    await setTimeout(()=>{
+      return navigate("/login"); 
+    }, 1000);
+       
+  };
 
   // on first render or any cookie change, fetch all plates and set current plate
   // to be the first plate if possible. Redirect to login as necessary.
-  console.log("before useEffect TopBar");
-  console.log(cookies);
-  console.log(document.cookie);
   useEffect(() => {
-    console.log("in useEffect TopBar, before verifyCookie");
-    console.log(cookies);
-    console.log(document.cookie);
-    const verifyCookie = async () => {
-      if (!cookies.token) {
-        console.log("in verifyCookie, cookies.token:");
-        console.log(cookies.token);
+    const fetchUserInfo = async () => {
+      if (!document.cookie) {
         return navigate("/login");
       }
       const { data } = await axios.get(
@@ -74,13 +77,7 @@ const TopBar = (props) => {
         { withCredentials: true }
       );
       if (data.unauthorized) {
-        console.log("in verifyCookie, data.unauthorized.");
-        console.log(data);
-        removeCookie("token");
-        console.log("after removing token with data.unauthorized.");
-        console.log(document.cookie);
-        console.log(cookies);
-        return navigate("/login");
+        return handleLogout();
       }
       setUsername(data.username);
       if (data.plates.length > 0) {
@@ -97,14 +94,8 @@ const TopBar = (props) => {
         });
       }
     };
-    verifyCookie();
-    console.log("in useEffect TopBar, after verifyCookie");
-    console.log(cookies);
-    console.log(document.cookie);
-  }, [cookies]);
-  console.log("after useEffect TopBar");
-  console.log(cookies);
-  console.log(document.cookie);
+    fetchUserInfo();
+  }, []);
 
   // ACTIONS ----------------------------------------------
 
@@ -183,8 +174,7 @@ const TopBar = (props) => {
       { withCredentials: true }
     );
     if (data.unauthorized) {
-      removeCookie("token");
-      return navigate("/login");
+      return handleLogout();
     }
     const result = data.output[0];
     if (!result.isCreated) {
@@ -239,8 +229,7 @@ const TopBar = (props) => {
       { withCredentials: true }
     );
     if (data.unauthorized) {
-      removeCookie("token");
-      return navigate("/login");
+      return handleLogout();
     }
     const result = data.output[0];
     if (result.reason) {
@@ -289,8 +278,7 @@ const TopBar = (props) => {
       { withCredentials: true }
     );
     if (data.unauthorized) {
-      removeCookie("token");
-      return navigate("/login");
+      return handleLogout();
     }
     if (data.failures.length > 0) {
       // should not happen during normal use
@@ -328,8 +316,7 @@ const TopBar = (props) => {
       { withCredentials: true }
     );
     if (data.unauthorized) {
-      removeCookie("token");
-      return navigate("/login");
+      return handleLogout();
     }
     if (data.failures.length > 0) {
       // should not happen during normal use
@@ -368,12 +355,8 @@ const TopBar = (props) => {
       setLogoutDialogDummy({});
     } else {
       setLogoutDialogDummy(null);
-      handleLogout({});
+      handleLogout();
     }
-  };
-  const handleLogout = (dummy) => {
-    removeCookie("token");  // will trigger the `cookies` dependence and cause redirection
-    toast.success("Logged out successfully");
   };
 
   // RENDERING --------------------------------------------

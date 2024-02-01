@@ -3,7 +3,7 @@ import TopBar from "../components/TopBar";
 import AssayPlate from "../components/AssayPlate";
 import Box from "@mui/material/Box";
 
-const Home = (cookieStuff) => {
+const Home = () => {
   const [currPlateName, setCurrPlateName] = useState("");
   const [currWellsInfo, setCurrWellsInfo] = useState(null);
   const [selectedPlate, setSelectedPlate] = useState(null);
@@ -22,7 +22,6 @@ const Home = (cookieStuff) => {
       overflow: "hidden",
       }}>
       <TopBar
-        {...cookieStuff}
         currPlateName={currPlateName}
         setCurrPlateName={setCurrPlateName}
         currWellsInfo={currWellsInfo}
