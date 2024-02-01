@@ -71,7 +71,7 @@ const TopBar = (props) => {
         { withCredentials: true }
       );
       if (data.unauthorized) {
-        return handleLogout();
+        return navigate("/login");
       }
       setUsername(data.username);
       if (data.plates.length > 0) {
