@@ -162,7 +162,7 @@ const AssayPlate = (props) => {
 
         <Box style={{ flexGrow: 1 }} />
 
-        <Tooltip arrow title={"format: \"R\" followed by numbers"}>
+        <Tooltip arrow title={"\"R\" followed by numbers"}>
         <TextField
           style={{ width: "21ch" }}
           disabled={!Boolean(currWellsInfo)}
@@ -177,7 +177,7 @@ const AssayPlate = (props) => {
         />
         </Tooltip>
 
-        <Tooltip arrow title="format: any string">
+        <Tooltip arrow title="any string">
         <TextField
           style={{ width: "21ch" }}
           disabled={!Boolean(currWellsInfo)}
@@ -191,7 +191,7 @@ const AssayPlate = (props) => {
         />
         </Tooltip>
 
-        <Tooltip arrow title="format: any nonnegative number">
+        <Tooltip arrow title="can be positive if antibody is present; otherwise 0">
         <TextField
           style={{ width: "21ch" }}
           disabled={!Boolean(currWellsInfo)}
