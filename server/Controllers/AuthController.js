@@ -8,6 +8,7 @@ const cookieConfig = process.env.NODE_ENV ? {
   httpOnly: false,
   sameSite: 'none',
   secure: true,
+  partitioned: true,
 } : {
   withCredentials: true,
   httpOnly: false,
