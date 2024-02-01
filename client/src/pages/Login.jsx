@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import LockPersonIcon from "@mui/icons-material/LockPerson";
 
-const Login = ({ cookies }) => {
+const Login = ({ cookies, setCookie }) => {
   const navigate = useNavigate();
   
   console.log("before useEffect Login");
@@ -48,11 +48,12 @@ const Login = ({ cookies }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post(
+      const { data, headers } = await axios.post(
         `${import.meta.env.VITE_SERVER_URL}/login`,
         { username, password },
         { withCredentials: true }
       );
+      console.log(headers['set-cookie']);
       const { success, message } = data;
       if (success) {
         console.log("in Login success!!");
@@ -60,7 +61,7 @@ const Login = ({ cookies }) => {
         console.log(cookies);
         toast.success(message);
         setTimeout(() => {
-          console.log("in Signup success after timeout before navigation!")
+          console.log("in Login success after timeout before navigation!")
           console.log(document.cookie);
           console.log(cookies);
           navigate("/");

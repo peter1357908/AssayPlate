@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
-const Signup = ({ cookies }) => {
+const Signup = ({ cookies, setCookie }) => {
   const navigate = useNavigate();
   console.log("before useEffect Signup");
   console.log(cookies);

@@ -10,8 +10,8 @@ function App() {
   return (
     <Routes>
       <Route path="/" exact element={<Home cookies={cookies} removeCookie={removeCookie} />} />
-      <Route path="/login" element={<Login cookies={cookies} />} />
-      <Route path="/signup" element={<Signup cookies={cookies} />} />
+      <Route path="/login" element={<Login cookies={cookies} setCookie={setCookie} />} />
+      <Route path="/signup" element={<Signup cookies={cookies} setCookie={setCookie} />} />
     </Routes>
   );
 }

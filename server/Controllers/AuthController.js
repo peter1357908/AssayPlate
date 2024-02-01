@@ -6,9 +6,8 @@ const bcrypt = require("bcrypt");
 const cookieOptions = process.env.NODE_ENV ? {
   withCredentials: true,
   httpOnly: false,
-  sameSite: 'none',
+  sameSite: "strict",
   secure: true,
-  partitioned: true,
 } : {
   withCredentials: true,
   httpOnly: false,

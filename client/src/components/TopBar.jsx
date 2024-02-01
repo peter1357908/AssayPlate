@@ -66,7 +66,7 @@ const TopBar = (props) => {
     const verifyCookie = async () => {
       if (!cookies.token) {
         console.log("in verifyCookie, cookies.token:");
-        console.log("cookies.token");
+        console.log(cookies.token);
         return navigate("/login");
       }
       const { data } = await axios.get(
