@@ -43,10 +43,7 @@ const Login = ({ cookies }) => {
       const { success, message } = data;
       if (success) {
         toast.success(message);
-        // timeout is needed to ensure that the cookie is generated
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
+        navigate("/");
       } else {
         toast.error(message);
       }

@@ -34,6 +34,7 @@ module.exports.Signup = async (req, res) => {
   res.cookie("token", token, {
     withCredentials: true,
     httpOnly: false,
+    sameSite: 'none',
   });
   return res.json({ 
     message: `"${username}" signed up successfully. Logged in automatically.`,
