@@ -25,6 +25,9 @@ const Login = ({ cookies }) => {
     console.log(cookies)
     console.log(document.cookie);
     if (cookies.token && cookies.token != "undefined") {
+      console.log("before navigation!!");
+      console.log(cookies)
+      console.log(document.cookie);
       navigate("/");
     }
   }, []);

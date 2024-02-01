@@ -24,7 +24,9 @@ const Signup = ({ cookies }) => {
     console.log(cookies)
     console.log(document.cookie);
     if (cookies.token && cookies.token != "undefined") {
-      navigate("/");
+      console.log("before navigation!!");
+      console.log(cookies)
+      console.log(document.cookie);
     }
   }, []);
 
