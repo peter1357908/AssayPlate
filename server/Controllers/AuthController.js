@@ -70,10 +70,7 @@ module.exports.Login = async (req, res) => {
     return res.json({message:"Incorrect password or username" }); 
   }
   const token = createSecretToken(user._id);
-  res.cookie("token", token, {
-    withCredentials: true,
-    httpOnly: false,
-  });
+  res.cookie("token", token, cookieConfig);
   return res.json({
     message: `"${username}" logged in successfully`,
     success: true
