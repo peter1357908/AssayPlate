@@ -1,6 +1,17 @@
 const User = require("../Models/UserModel");
 const { createSecretToken } = require("../util/SecretToken");
+require("dotenv").config();
 const bcrypt = require("bcrypt");
+
+const cookieConfig = process.env.NODE_ENV ? {
+  withCredentials: true,
+  httpOnly: false,
+  sameSite: 'none',
+  secure: true,
+} : {
+  withCredentials: true,
+  httpOnly: false,
+};
 
 module.exports.Signup = async (req, res) => {
   const { username, password } = req.body;
@@ -31,11 +42,8 @@ module.exports.Signup = async (req, res) => {
   }
   
   const token = createSecretToken(user._id);
-  res.cookie("token", token, {
-    withCredentials: true,
-    httpOnly: false,
-    sameSite: 'none',
-  });
+  res.cookie("token", token, cookieConfig);
+  
   return res.json({ 
     message: `"${username}" signed up successfully. Logged in automatically.`,
     success: true
