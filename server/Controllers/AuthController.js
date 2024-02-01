@@ -3,7 +3,8 @@ const User = require("../Models/UserModel");
 const { createSecretToken } = require("../util/SecretToken");
 const bcrypt = require("bcrypt");
 
-const cookieOptions = process.env.NODE_ENV ? {
+const cookieOptions = process.env.DOMAIN ? {
+  domain: process.env.DOMAIN,
   withCredentials: true,
   httpOnly: false,
   sameSite: "strict",
