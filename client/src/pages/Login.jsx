@@ -15,11 +15,18 @@ import LockPersonIcon from "@mui/icons-material/LockPerson";
 
 const Login = () => {
   const navigate = useNavigate();
-  // if a token already exists, just navigate to the home page.
+  // if a valid cookie already exists, just navigate to the home page.
   useEffect(() => {
-    if (document.cookie) {
-      navigate("/");
-    }
+    const redirectIfValidCookie = async () => {
+      const { data } = await axios.get(
+        import.meta.env.VITE_SERVER_URL,
+        { withCredentials: true }
+      );
+      if (!data.unauthorized) {
+        navigate("/");
+      }
+    };
+    redirectIfValidCookie();
   }, []);
 
   const [username, setUsername] = useState("");

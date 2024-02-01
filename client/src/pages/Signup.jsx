@@ -15,11 +15,18 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 const Signup = () => {
   const navigate = useNavigate();
-  // if a token already exists, just navigate to the home page.
+  // if a valid cookie already exists, just navigate to the home page.
   useEffect(() => {
-    if (document.cookie) {
-      navigate("/");
-    }
+    const redirectIfValidCookie = async () => {
+      const { data } = await axios.get(
+        import.meta.env.VITE_SERVER_URL,
+        { withCredentials: true }
+      );
+      if (!data.unauthorized) {
+        navigate("/");
+      }
+    };
+    redirectIfValidCookie();
   }, []);
   
   const [username, setUsername] = useState("");

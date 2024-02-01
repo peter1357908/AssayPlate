@@ -59,19 +59,13 @@ const TopBar = (props) => {
       {},
       { withCredentials: true }
     );
-    await setTimeout(()=>{
-      return navigate("/login"); 
-    }, 1000);
-       
+    return navigate("/login");
   };
 
-  // on first render or any cookie change, fetch all plates and set current plate
-  // to be the first plate if possible. Redirect to login as necessary.
+  // on first render fetch all plates and set current plate
+  // to be the first plate if possible. Redirect to /login as necessary.
   useEffect(() => {
     const fetchUserInfo = async () => {
-      if (!document.cookie) {
-        return navigate("/login");
-      }
       const { data } = await axios.get(
         PlatesURL,
         { withCredentials: true }

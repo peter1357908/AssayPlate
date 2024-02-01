@@ -87,8 +87,9 @@ module.exports.Logout = async (req, res) => {
   // since the token isn't actually stateful, we simply send
   // back a response to mark the cookie as expired AND invalid
   res.cookie("token", "INVALID", logoutCookieOptions);
-  return res.json({
-    message: `Logout request processed.`,
-    success: true
-  });
+  return res.end();
 }
+
+module.exports.GetUsername = async (req, res) => {
+  return res.json({ username: req.user.username });
+};
