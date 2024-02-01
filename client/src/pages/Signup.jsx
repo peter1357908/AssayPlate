@@ -16,18 +16,21 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 const Signup = ({ cookies }) => {
   const navigate = useNavigate();
   console.log("before useEffect Signup");
-  console.log(cookies);
+  console.log(cookies)
+  console.log(document.cookie);
   // if a token already exists, just navigate to the home page.
   useEffect(() => {
     console.log("in useEffect Signup");
-    console.log(cookies);
+    console.log(cookies)
+  console.log(document.cookie);
     if (cookies.token && cookies.token != "undefined") {
       navigate("/");
     }
   }, []);
 
   console.log("after useEffect Signup");
-  console.log(cookies);
+  console.log(cookies)
+  console.log(document.cookie);
   
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
