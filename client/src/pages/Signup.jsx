@@ -49,7 +49,9 @@ const Signup = ({ cookies }) => {
       const { success, message } = data;
       if (success) {
         toast.success(message);
-        navigate("/");
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
       } else {
         toast.error(message);
       }
