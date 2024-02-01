@@ -57,14 +57,16 @@ const TopBar = (props) => {
   // on first render or any cookie change, fetch all plates and set current plate
   // to be the first plate if possible. Redirect to login as necessary.
   console.log("before useEffect TopBar");
-  console.log(cookies)
+  console.log(cookies);
   console.log(document.cookie);
   useEffect(() => {
     console.log("in useEffect TopBar, before verifyCookie");
-    console.log(cookies)
+    console.log(cookies);
     console.log(document.cookie);
     const verifyCookie = async () => {
-      if (!cookies.token || cookies.token === "undefined") {
+      if (!cookies.token) {
+        console.log("in verifyCookie, cookies.token:");
+        console.log("cookies.token");
         return navigate("/login");
       }
       const { data } = await axios.get(
@@ -72,7 +74,12 @@ const TopBar = (props) => {
         { withCredentials: true }
       );
       if (data.unauthorized) {
+        console.log("in verifyCookie, data.unauthorized.");
+        console.log(data);
         removeCookie("token");
+        console.log("after removing token with data.unauthorized.");
+        console.log(document.cookie);
+        console.log(cookies);
         return navigate("/login");
       }
       setUsername(data.username);
@@ -92,11 +99,11 @@ const TopBar = (props) => {
     };
     verifyCookie();
     console.log("in useEffect TopBar, after verifyCookie");
-    console.log(cookies)
+    console.log(cookies);
     console.log(document.cookie);
   }, [cookies]);
   console.log("after useEffect TopBar");
-  console.log(cookies)
+  console.log(cookies);
   console.log(document.cookie);
 
   // ACTIONS ----------------------------------------------

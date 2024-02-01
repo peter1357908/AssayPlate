@@ -16,22 +16,23 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 const Signup = ({ cookies }) => {
   const navigate = useNavigate();
   console.log("before useEffect Signup");
-  console.log(cookies)
+  console.log(cookies);
   console.log(document.cookie);
   // if a token already exists, just navigate to the home page.
   useEffect(() => {
     console.log("in useEffect Signup");
-    console.log(cookies)
+    console.log(cookies);
     console.log(document.cookie);
-    if (cookies.token && cookies.token != "undefined") {
-      console.log("before navigation!!");
-      console.log(cookies)
+    if (cookies.token) {
+      console.log("before Signup useEffect navigation!!");
+      console.log(cookies);
       console.log(document.cookie);
+      navigate("/");
     }
   }, []);
 
   console.log("after useEffect Signup");
-  console.log(cookies)
+  console.log(cookies);
   console.log(document.cookie);
   
   const [username, setUsername] = useState("");
@@ -54,7 +55,13 @@ const Signup = ({ cookies }) => {
       const { success, message } = data;
       if (success) {
         toast.success(message);
+        console.log("in Signup success!")
+        console.log(document.cookie);
+        console.log(cookies);
         setTimeout(() => {
+          console.log("in Signup success after timeout before navigation!")
+          console.log(document.cookie);
+          console.log(cookies);
           navigate("/");
         }, 1000);
       } else {

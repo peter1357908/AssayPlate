@@ -17,16 +17,16 @@ const Login = ({ cookies }) => {
   const navigate = useNavigate();
   
   console.log("before useEffect Login");
-  console.log(cookies)
+  console.log(cookies);
   console.log(document.cookie);
   // if a token already exists, just navigate to the home page.
   useEffect(() => {
     console.log("in useEffect Login");
-    console.log(cookies)
+    console.log(cookies);
     console.log(document.cookie);
-    if (cookies.token && cookies.token != "undefined") {
-      console.log("before navigation!!");
-      console.log(cookies)
+    if (cookies.token) {
+      console.log("in Login useEffect before navigation!!");
+      console.log(cookies);
       console.log(document.cookie);
       navigate("/");
     }
@@ -55,8 +55,14 @@ const Login = ({ cookies }) => {
       );
       const { success, message } = data;
       if (success) {
+        console.log("in Login success!!");
+        console.log(document.cookie);
+        console.log(cookies);
         toast.success(message);
         setTimeout(() => {
+          console.log("in Signup success after timeout before navigation!")
+          console.log(document.cookie);
+          console.log(cookies);
           navigate("/");
         }, 1000);
       } else {
