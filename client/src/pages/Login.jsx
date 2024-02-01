@@ -23,7 +23,7 @@ const Login = ({ cookies }) => {
   useEffect(() => {
     console.log("in useEffect Login");
     console.log(cookies)
-  console.log(document.cookie);
+    console.log(document.cookie);
     if (cookies.token && cookies.token != "undefined") {
       navigate("/");
     }

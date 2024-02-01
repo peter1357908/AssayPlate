@@ -62,7 +62,7 @@ const TopBar = (props) => {
   useEffect(() => {
     console.log("in useEffect TopBar, before verifyCookie");
     console.log(cookies)
-  console.log(document.cookie);
+    console.log(document.cookie);
     const verifyCookie = async () => {
       if (!cookies.token || cookies.token === "undefined") {
         return navigate("/login");
@@ -93,10 +93,10 @@ const TopBar = (props) => {
     verifyCookie();
     console.log("in useEffect TopBar, after verifyCookie");
     console.log(cookies)
-  console.log(document.cookie);
+    console.log(document.cookie);
   }, [cookies]);
   console.log("after useEffect TopBar");
-    console.log(cookies)
+  console.log(cookies)
   console.log(document.cookie);
 
   // ACTIONS ----------------------------------------------

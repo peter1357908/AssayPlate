@@ -5,7 +5,7 @@ import Signup from "./pages/Signup";
 import { useCookies } from "react-cookie";
 
 function App() {
-  const [cookies, removeCookie] = useCookies(["token"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
 
   return (
     <Routes>
