@@ -23,6 +23,7 @@ import {
   Save as SaveIcon,
   RestorePage as RestorePageIcon,
   ControlCamera as ControlCameraIcon,
+  PersonRemove as PersonRemoveIcon
 } from "@mui/icons-material";
 import ConfirmDialog from "./ConfirmDialog";
 
@@ -353,6 +354,17 @@ const TopBar = (props) => {
     }
   };
 
+  // Logout ============================
+  const [deleteAccountDummy, setDeleteAccountDummy] = useState(null);
+  const onDeleteAccount = () => { setDeleteAccountDummy({}); };
+  const handleDeleteAccount = async (dummy) => {
+    await axios.delete(
+      import.meta.env.VITE_SERVER_URL,
+      { withCredentials: true }
+    );
+    navigate("/login");
+  };
+
   // RENDERING --------------------------------------------
   const topBarStyle = {
     padding: "0.2em 0",
@@ -533,6 +545,20 @@ const TopBar = (props) => {
       transformOrigin={{ horizontal: "right", vertical: "top" }}
       anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
     >
+      <MenuItem onClick={onDeleteAccount}>
+        <ListItemIcon>
+          <PersonRemoveIcon fontSize="small" />
+        </ListItemIcon>
+        Delete Account
+      </MenuItem>
+      <ConfirmDialog 
+        candidate={deleteAccountDummy}
+        setCandidate={setDeleteAccountDummy}
+        onConfirm={handleDeleteAccount}
+        actionTitle="Delete your account?"
+        actionDescription="You will lose all your plates on the cloud."
+      />
+
       <MenuItem onClick={onLogout}>
         <ListItemIcon>
           <LogoutIcon fontSize="small" />
@@ -545,7 +571,7 @@ const TopBar = (props) => {
         onConfirm={handleLogout}
         actionTitle="Unsaved changes in current plate"
         actionDescription="Do you wish to discard the changes and log out?"
-    />
+      />
     </Menu> 
     </Toolbar>
     </AppBar>

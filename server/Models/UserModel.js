@@ -19,4 +19,8 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+userSchema.pre('remove',async function () {
+  await this.model('plates').deleteMany({ _id: this.plates });
+});
+
 module.exports = mongoose.model("User", userSchema);
