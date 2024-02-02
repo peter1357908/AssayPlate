@@ -1,6 +1,7 @@
 #assay-plate {
+  touch-action: none;
   cursor: move;
-  padding: 1em;
+  padding: 1.3em;
   background-color: mintcream;
   display: flex;
   flex-direction: column;

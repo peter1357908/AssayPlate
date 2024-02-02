@@ -121,6 +121,7 @@ const AssayPlate = (props) => {
       <Draggable
         position={platePos}
         onStop={(e, value)=>{setPlatePos({...value})}}
+        cancel=".well-button"
       >
         <Paper id="assay-plate" elevation={10} >
           {plate.map((row, rowIndex) => (
