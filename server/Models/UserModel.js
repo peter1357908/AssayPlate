@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Plate = require("./PlateModel");
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -19,8 +20,8 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.pre('remove',async function () {
-  await this.model('plates').deleteMany({ _id: this.plates });
+userSchema.pre("deleteOne", { document: true }, async function () {
+  await Plate.deleteMany({ _id: { $in: this.plates} });
 });
 
 module.exports = mongoose.model("User", userSchema);

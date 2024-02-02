@@ -95,7 +95,7 @@ module.exports.GetUsername = async (req, res) => {
 };
 
 module.exports.DeleteUser = async (req, res) =>{
-  await User.deleteOne({ _id: req.user._id });  // don't have to await
+  await req.user.deleteOne({ _id: req.user._id })
   res.cookie("token", "INVALID", logoutCookieOptions);
   return res.end();
 }
