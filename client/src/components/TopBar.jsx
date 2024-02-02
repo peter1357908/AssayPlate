@@ -376,6 +376,7 @@ const TopBar = (props) => {
     <Toolbar style={{ gap: "0.2em" }}>
     <Autocomplete 
       style={{ width: "28ch" }}
+      slotProps={{ popper: { style: { minWidth: "28ch" }}}}
       options={platesCache}
       autoHighlight
       disableClearable

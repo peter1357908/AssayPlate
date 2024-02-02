@@ -118,13 +118,18 @@ const AssayPlate = (props) => {
     }
 
     return (
-      <Paper id="assay-plate" elevation={10} >
-        {plate.map((row, rowIndex) => (
-          <Box className="assay-plate-row" key={rowIndex}>
-            {row.map((component, componentIdex) => (component))}
-          </Box>
-        ))}
-      </Paper>
+      <Draggable
+        position={platePos}
+        onStop={(e, value)=>{setPlatePos({...value})}}
+      >
+        <Paper id="assay-plate" elevation={10} >
+          {plate.map((row, rowIndex) => (
+            <Box className="assay-plate-row" key={rowIndex}>
+              {row}
+            </Box>
+          ))}
+        </Paper>
+      </Draggable>
     );
   };
 
@@ -137,13 +142,7 @@ const AssayPlate = (props) => {
 
   return (
     <>
-    <Draggable
-      position={platePos}
-      onStop={(e, value)=>{setPlatePos({...value})}}
-    >
-      {renderPlate()}
-    </Draggable>
-    
+    {renderPlate()}
     <AppBar position="fixed" style={bottomBarStyle}>
       <Toolbar>
         <TextField
