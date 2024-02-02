@@ -4,11 +4,19 @@ const ObjectId = require("mongoose");
 // CreatePlates, ReadPlates, UpdatePlates, DeletePlates
 
 const isIterable = object =>
-  object != null && typeof object[Symbol.iterator] === 'function';
+  object != null && typeof object[Symbol.iterator] === "function";
 
 module.exports.GetPlatesAndUsername = async (req, res) => {
+  const numPlatesRefs = req.user.plates.length;
   await req.user.populate("plates");
-  return res.json({ plates: req.user.plates, username: req.user.username });
+
+  res.json({ plates: req.user.plates, username: req.user.username });
+
+  // remove dead references
+  if (req.user.plates.length != numPlatesRefs) {
+    req.user.markModified("plates");
+    req.user.save();
+  }
 };
 
 module.exports.CreatePlates = async (req, res) => {
@@ -161,7 +169,7 @@ module.exports.ReadPlates = async (req, res) => {
       // this might happen when the plate is deleted but the ownership wasn't updated correctly
       output.push({
         _id,
-        reason: "You own the specified plate but somehow we could not find the plate' data. Removed the plate from your ownership."
+        reason: "You own the specified plate but somehow we could not find its data. Removed the plate from your ownership."
       });
       req.user.plates.splice(index, 1);
       try { await req.user.save(); } catch (err) { console.log(err); }
@@ -208,7 +216,7 @@ module.exports.UpdatePlates = async (req, res) => {
       // this might happen when the plate is deleted but the ownership wasn't updated correctly
       failures.push({
         _id,
-        reason: "You own the specified plate but somehow we could not find the plate' data. Removed the plate from your ownership."
+        reason: "You own the specified plate but somehow we could not find its data. Removed the plate from your ownership."
       });
       req.user.plates.splice(index, 1);
       try { await req.user.save(); } catch (err) { console.log(err); }
