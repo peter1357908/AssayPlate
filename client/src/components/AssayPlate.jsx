@@ -73,8 +73,7 @@ const AssayPlate = (props) => {
 
     const newWellsInfo = {...currWellsInfo};
     const newWell = newWellsInfo.wells[currWellIndex];
-    if (newConcentrationString && 
-      (!newConcentrationString.match(/^\d*\.?\d+$/) || !newWell.antibody)) {
+    if (!newConcentrationString.match(/^\d*\.?\d+$/) || !newWell.antibody) {
       newWell.concentrationIsInvalid = true;
     } else {
       newWell.concentrationIsInvalid = false;
