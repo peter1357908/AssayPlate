@@ -1,7 +1,7 @@
 # AssayPlate
 Plan experiments with this Assay Plate web app!
 
-This is primarily a MERN stack demo that showcases many common features of a full-stack app (responsive frontend, stateless authentication, public API, etc.).
+This is primarily a MERN stack demo that showcases many common features of a full-stack app (responsive frontend, stateless authentication, public API, etc.). I summarized my learnings from building this demo [on my website](https://peterish.com/programming/full-stack-dev-note-MERNs/).
 
 ## Notable Features:
 
