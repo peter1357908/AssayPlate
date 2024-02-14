@@ -70,7 +70,7 @@ const Signup = () => {
       <Button type="submit" color="primary" variant="contained" onClick={handleSubmit} style={buttonstyle} fullWidth>Sign up</Button>
       <Typography>Already have an account? <Link underline="hover" component={RouterLink} to="/login">Log in</Link></Typography>
       <Divider variant="middle" flexItem />
-      <Typography variant="caption">Fully stacked by <Link underline="hover" href="https://peterish.com/" target="_blank">Peter Gao</Link></Typography>
+      <Typography variant="caption">Fully stacked by <Link underline="hover" href="https://peterish.com/programming/full-stack-dev-note-MERNs/" target="_blank">Peter Gao</Link></Typography>
     </Paper>
   );
 };
